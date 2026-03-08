@@ -35,9 +35,9 @@ kết quả xét nghiệm.
 
   Role         Description
   ------------ --------------------------------------------------
-  👤 Patient   Đặt lịch khám, xem đơn thuốc, kết quả xét nghiệm
-  👨‍⚕️ Doctor    Khám bệnh, kê đơn thuốc, yêu cầu xét nghiệm
-  🛠 Admin      Quản lý bác sĩ, chuyên khoa, thuốc, báo cáo
+  ### 👤 Patient   Đặt lịch khám, xem đơn thuốc, kết quả xét nghiệm
+  ### 👨‍⚕️ Doctor    Khám bệnh, kê đơn thuốc, yêu cầu xét nghiệm
+  ### 🛠 Admin      Quản lý bác sĩ, chuyên khoa, thuốc, báo cáo
 
 ------------------------------------------------------------------------
 
