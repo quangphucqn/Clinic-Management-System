@@ -42,21 +42,21 @@ kết quả xét nghiệm.
 ------------------------------------------------------------------------
 
 # System Features
-BỆNH NHÂN (6 tính năng): 
+## BỆNH NHÂN (6 tính năng): 
 ├── Đặt lịch khám online (chọn bác sĩ, ngày giờ) 
 ├── Thanh toán đặt cọc 
 ├── Xem lịch sử khám bệnh 
 ├── Xem đơn thuốc 
 ├── Xem kết quả xét nghiệm 
 └── Đánh giá bác sĩ 
-BÁC SĨ (6 tính năng): 
+## BÁC SĨ (6 tính năng): 
 ├── Xem lịch khám trong ngày 
 ├── Khám bệnh (ghi chẩn đoán) 
 ├── Kê đơn thuốc 
 ├── Yêu cầu xét nghiệm 
 ├── Xem lịch sử bệnh nhân 
 └── Quản lý hồ sơ cá nhân 
-ADMIN (6 tính năng): 
+## ADMIN (6 tính năng): 
 ├── Quản lý bác sĩ (CRUD) 
 ├── Quản lý danh mục chuyên khoa 
 ├── Quản lý danh mục thuốc 
