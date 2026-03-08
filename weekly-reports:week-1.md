@@ -22,7 +22,7 @@
 ## 4. Công Nghệ Sử Dụng
 - Backend: Spring Boot 
 - Database: PostgreSQL 
-- Frontend: NodeJS
+- Frontend: ReactJS
 - Other: Docker, Nginx
 ## 5. Phân Công Công Việc
 | Thành viên | Công việc | Timeline | 
@@ -30,4 +30,5 @@
 | Trần Quang Phục | BE - FE - Admin module | Week 1-10 |
 | Phan Thanh Trình | BE - FE - Patient module | Week 1-10 | 
 | Lê Hoàng Phúc | BE - FE - Doctor module | Week 1-10 |
+
 
