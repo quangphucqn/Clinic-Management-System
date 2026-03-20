@@ -1,8 +1,20 @@
 package com.tqp.cms.service;
 
+import com.tqp.cms.dto.request.UserCreationRequest;
+import com.tqp.cms.dto.request.UserUpdateRequest;
 import com.tqp.cms.dto.response.UserResponse;
-import java.util.List;
+import org.springframework.data.domain.Page;
+
+import java.util.UUID;
 
 public interface UserService {
-    List<UserResponse> getUsers();
+    UserResponse createUser(UserCreationRequest request);
+
+    Page<UserResponse> getUsers(int page, int size, String username);
+
+    UserResponse getUserById(UUID userId);
+
+    UserResponse updateUser(UUID userId, UserUpdateRequest request);
+
+    void softDeleteUser(UUID userId);
 }
