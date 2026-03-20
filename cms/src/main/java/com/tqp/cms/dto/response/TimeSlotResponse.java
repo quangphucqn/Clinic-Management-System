@@ -7,8 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.UUID;
 
 @Data
@@ -16,18 +16,13 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MedicineResponse {
+public class TimeSlotResponse {
     UUID id;
-    String code;
-    String name;
-    String unitName;
-    String ingredient;
-    String manufacturer;
-    BigDecimal price;
-    Integer stockQuantity;
-    String description;
-    String imageUrl;
-    String imagePublicId;
+    String slotCode;
+    LocalTime startTime;
+    LocalTime endTime;
+    Integer maxPatientsPerSlot;
+    boolean enabled;
     boolean active;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;

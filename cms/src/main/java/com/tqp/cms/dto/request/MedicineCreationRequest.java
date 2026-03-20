@@ -30,7 +30,7 @@ public class MedicineCreationRequest {
 
     @NotBlank(message = "FIELD_REQUIRED")
     @Size(max = 255, message = "VALIDATION_ERROR")
-    String unit;
+    String unitName;
 
     String ingredient;
 

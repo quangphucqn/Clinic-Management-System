@@ -22,7 +22,7 @@ public class MedicineUpdateRequest {
     String name;
 
     @Size(max = 255, message = "VALIDATION_ERROR")
-    String unit;
+    String unitName;
 
     String ingredient;
 

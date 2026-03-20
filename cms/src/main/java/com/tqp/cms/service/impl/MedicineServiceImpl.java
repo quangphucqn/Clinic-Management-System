@@ -10,6 +10,7 @@ import com.tqp.cms.exception.AppException;
 import com.tqp.cms.exception.ErrorCode;
 import com.tqp.cms.mapper.MedicineMapper;
 import com.tqp.cms.repository.MedicineRepository;
+import com.tqp.cms.repository.UnitRepository;
 import com.tqp.cms.service.MedicineService;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -27,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MedicineServiceImpl implements MedicineService {
     MedicineRepository medicineRepository;
+    UnitRepository unitRepository;
     MedicineMapper medicineMapper;
     Cloudinary cloudinary;
 
@@ -37,6 +39,7 @@ public class MedicineServiceImpl implements MedicineService {
             throw new AppException(ErrorCode.MEDICINE_EXISTED);
         }
         var medicine = medicineMapper.toMedicine(request);
+        medicine.setUnit(resolveOrCreateUnit(request.getUnitName()));
         return medicineMapper.toMedicineResponse(medicineRepository.save(medicine));
     }
 
@@ -70,8 +73,8 @@ public class MedicineServiceImpl implements MedicineService {
         if (request.getName() != null) {
             medicine.setName(request.getName());
         }
-        if (request.getUnit() != null) {
-            medicine.setUnit(request.getUnit());
+        if (request.getUnitName() != null) {
+            medicine.setUnit(resolveOrCreateUnit(request.getUnitName()));
         }
         if (request.getIngredient() != null) {
             medicine.setIngredient(request.getIngredient());
@@ -101,6 +104,14 @@ public class MedicineServiceImpl implements MedicineService {
         var medicine = medicineRepository.findById(medicineId)
                 .orElseThrow(() -> new AppException(ErrorCode.MEDICINE_NOT_FOUND));
         medicineRepository.delete(medicine);
+    }
+
+    private com.tqp.cms.entity.Unit resolveOrCreateUnit(String unitName) {
+        if (unitName == null || unitName.isBlank()) {
+            throw new AppException(ErrorCode.FIELD_REQUIRED);
+        }
+        return unitRepository.findByName(unitName.trim())
+                .orElseGet(() -> unitRepository.save(com.tqp.cms.entity.Unit.builder().name(unitName.trim()).build()));
     }
 
     @Override
