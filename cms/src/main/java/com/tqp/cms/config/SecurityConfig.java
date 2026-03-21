@@ -17,6 +17,13 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
+    private static final String[] SWAGGER_ENDPOINT = {
+            "/v3/api-docs/**",
+            "/v3/api-docs.yaml",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
+    };
+
     @Value("${jwt.signerKey}")
     private String signerKey;
 
@@ -27,6 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/patients/register").permitAll()
+                        .requestMatchers(SWAGGER_ENDPOINT).permitAll()
                         .anyRequest().authenticated()
                 );
 
