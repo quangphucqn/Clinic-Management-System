@@ -11,8 +11,8 @@
 | Thành viên | MSSV | Công việc | Link Commit/PR |
 |------------|------|-----------|----------------|
 | Trần Quang Phục | 2251052097 | Thiết kế kiến DB,API authencitation, login, CRUD thuốc, giờ khám |
-| Phan Thanh Trình | 2251052128 | Phân tích yêu cầu, vẽ usecase hệ thống |
-| Lê Hoàng Phúc | 2251052095 | Phân tích yêu cầu, vẽ usecase hệ thống |
+| Phan Thanh Trình | 2251052128 | Phân tích yêu cầu, vẽ usecase hệ thống, thiết kế api xem đơn thuốc |
+| Lê Hoàng Phúc | 2251052095 | Phân tích yêu cầu, vẽ usecase hệ thống, thiết kế api xem lịch khám|
 
 ---
 
