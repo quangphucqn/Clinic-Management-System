@@ -20,7 +20,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AppointmentDoctorDetailsResponse {
     UUID id;
-    Patient patient;
+    PatientAppoinmentDoctorResponse patient;
     Doctor doctor;
     TimeSlotConfig timeSlotConfig;
     LocalDate appointmentDate;

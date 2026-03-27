@@ -1,6 +1,7 @@
 package com.tqp.cms.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.tqp.cms.entity.AppointmentStatus;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -17,8 +18,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class AppointmentDoctorRequest {
 
-    @NotNull(message = "APPOINTMENT_DATE_REQUIRED")
     @JsonFormat(pattern = "yyyy-MM-dd")
     LocalDate appointmentDate;
 
+    AppointmentStatus status;
 }
