@@ -44,7 +44,7 @@ public class AuthenticationService {
     protected String signerKey;
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        var user = usersRepository.findByUsername(request.getUsername())
+        var user = usersRepository.findByUsernameAndActiveTrue(request.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
 
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
@@ -75,7 +75,7 @@ public class AuthenticationService {
                 .subject(username)
                 .issuer("cms.tqp.com")
                 .issueTime(new Date())
-                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
+                .expirationTime(new Date(Instant.now().plus(4, ChronoUnit.HOURS).toEpochMilli()))
                 .claim("scope", buildScope(role))
                 .build();
         Payload payload = new Payload(claimsSet.toJSONObject());

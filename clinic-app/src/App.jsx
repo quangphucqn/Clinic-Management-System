@@ -1,0 +1,153 @@
+import { ConfigProvider } from 'antd'
+import viVN from 'antd/locale/vi_VN'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import RequireAuth from './components/auth/RequireAuth.jsx'
+import RequireRole from './components/auth/RequireRole.jsx'
+import RoleHomeRedirect from './components/auth/RoleHomeRedirect.jsx'
+import { ROUTES } from './constants/routes.js'
+import { ROLES } from './constants/roles.js'
+import { AuthProvider } from './context/AuthContext.jsx'
+import AuthLayout from './layouts/AuthLayout.jsx'
+import PortalLayout from './layouts/PortalLayout.jsx'
+import HomePage from './pages/HomePage.jsx'
+import LoginPage from './pages/auth/LoginPage.jsx'
+import RegisterPage from './pages/auth/RegisterPage.jsx'
+import FeaturePage from './pages/portal/FeaturePage.jsx'
+import ProfilePage from './pages/portal/ProfilePage.jsx'
+
+export default function App() {
+  return (
+    <ConfigProvider
+      locale={viVN}
+      theme={{ token: { fontFamily: "'Quicksand', system-ui, sans-serif" } }}
+    >
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path={ROUTES.home} element={<HomePage />} />
+            <Route element={<AuthLayout />}>
+              <Route path={ROUTES.login} element={<LoginPage />} />
+              <Route path={ROUTES.register} element={<RegisterPage />} />
+            </Route>
+
+            <Route
+              path={ROUTES.app}
+              element={
+                <RequireAuth>
+                  <PortalLayout />
+                </RequireAuth>
+              }
+            >
+              <Route index element={<RoleHomeRedirect />} />
+              <Route path="profile" element={<ProfilePage />} />
+
+              <Route
+                path="patient/bookings/new"
+                element={
+                  <RequireRole roles={[ROLES.PATIENT]}>
+                    <FeaturePage
+                      title="Đặt khám"
+                      description="Bệnh nhân có thể chọn bác sĩ, khung giờ và tạo lịch khám tại đây."
+                    />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="patient/appointments"
+                element={
+                  <RequireRole roles={[ROLES.PATIENT]}>
+                    <FeaturePage
+                      title="Lịch khám của tôi"
+                      description="Danh sách lịch hẹn sắp tới của bệnh nhân."
+                    />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="patient/history"
+                element={
+                  <RequireRole roles={[ROLES.PATIENT]}>
+                    <FeaturePage
+                      title="Lịch sử khám"
+                      description="Bệnh nhân xem lại các lần khám và kết quả trước đây."
+                    />
+                  </RequireRole>
+                }
+              />
+
+              <Route
+                path="doctor/schedule"
+                element={
+                  <RequireRole roles={[ROLES.DOCTOR]}>
+                    <FeaturePage
+                      title="Lịch khám bác sĩ"
+                      description="Bác sĩ theo dõi các lịch hẹn bệnh nhân theo từng ngày."
+                    />
+                  </RequireRole>
+                }
+              />
+
+              <Route
+                path="admin/timeslots"
+                element={
+                  <RequireRole roles={[ROLES.ADMIN]}>
+                    <FeaturePage
+                      title="Quản lý timeslot"
+                      description="Quản trị viên cấu hình khung giờ khám cho hệ thống."
+                    />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="admin/doctors"
+                element={
+                  <RequireRole roles={[ROLES.ADMIN]}>
+                    <FeaturePage
+                      title="Quản lý bác sĩ"
+                      description="Quản trị viên thêm/sửa thông tin bác sĩ, chuyên khoa."
+                    />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="admin/notifications"
+                element={
+                  <RequireRole roles={[ROLES.ADMIN]}>
+                    <FeaturePage
+                      title="Quản lý thông báo"
+                      description="Quản trị viên tạo và quản lý thông báo tới người dùng."
+                    />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="admin/medicine-categories"
+                element={
+                  <RequireRole roles={[ROLES.ADMIN]}>
+                    <FeaturePage
+                      title="Quản lý danh mục thuốc"
+                      description="Quản trị viên quản lý nhóm và phân loại thuốc."
+                    />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="admin/medicines"
+                element={
+                  <RequireRole roles={[ROLES.ADMIN]}>
+                    <FeaturePage
+                      title="Quản lý thuốc"
+                      description="Quản trị viên quản lý danh sách thuốc trong hệ thống."
+                    />
+                  </RequireRole>
+                }
+              />
+            </Route>
+
+            <Route path="*" element={<Navigate to={ROUTES.home} replace />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </ConfigProvider>
+  )
+}
