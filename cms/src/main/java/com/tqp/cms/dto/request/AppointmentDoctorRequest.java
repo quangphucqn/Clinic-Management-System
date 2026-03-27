@@ -22,4 +22,8 @@ public class AppointmentDoctorRequest {
     LocalDate appointmentDate;
 
     AppointmentStatus status;
+
+
+    Integer page = 0;
+    Integer size = 1;
 }

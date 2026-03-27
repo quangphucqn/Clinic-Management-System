@@ -21,8 +21,7 @@ import java.util.UUID;
 public class AppointmentDoctorDetailsResponse {
     UUID id;
     PatientAppoinmentDoctorResponse patient;
-    Doctor doctor;
-    TimeSlotConfig timeSlotConfig;
+    String timeSlot;
     LocalDate appointmentDate;
     AppointmentStatus status;
     BigDecimal depositAmount;
