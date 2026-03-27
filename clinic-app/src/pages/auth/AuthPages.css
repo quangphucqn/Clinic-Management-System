@@ -1,0 +1,25 @@
+.auth-page__button.ant-btn {
+  height: 46px;
+  border-color: #6cc5d8 !important;
+  border-radius: 12px;
+  background: #6cc5d8 !important;
+  color: #fff !important;
+  font-weight: 600;
+  box-shadow: 0 10px 24px rgba(22, 69, 78, 0.18);
+  transition: all 0.2s ease;
+}
+
+.auth-page__button.ant-btn:hover,
+.auth-page__button.ant-btn:focus,
+.auth-page__button.ant-btn:active,
+.auth-page__button.ant-btn.ant-btn-loading {
+  border-color: #6cc5d8 !important;
+  background: #6cc5d8 !important;
+  color: #fff !important;
+}
+
+.auth-page__button.ant-btn:hover,
+.auth-page__button.ant-btn:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(22, 69, 78, 0.22);
+}

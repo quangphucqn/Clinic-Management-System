@@ -1,0 +1,58 @@
+.portal-layout {
+  min-height: 100vh;
+}
+
+.portal-layout__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+}
+
+.portal-layout__brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #6cc5d8;
+}
+
+.portal-layout__brand-logo {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.portal-layout__brand-text {
+  color: #6cc5d8;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+}
+
+.portal-layout__header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.portal-layout__content {
+  padding: 20px;
+  background: #f5f7fb;
+}
+
+.portal-layout__profile-link.ant-btn {
+  padding-inline: 0;
+  color: #111 !important;
+  font-weight: 700;
+}
+
+.portal-layout__profile-link.ant-btn:hover,
+.portal-layout__profile-link.ant-btn:focus {
+  color: #6cc5d8 !important;
+}
+
