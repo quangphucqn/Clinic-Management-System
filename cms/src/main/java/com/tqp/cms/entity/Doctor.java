@@ -52,9 +52,6 @@ public class Doctor extends BaseEntity {
     @Column(nullable = false)
     Integer yearsOfExperience;
 
-    @Column(nullable = false, precision = 12, scale = 2)
-    BigDecimal consultationFee;
-
     @Column(columnDefinition = "TEXT")
     String biography;
 

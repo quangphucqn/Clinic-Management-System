@@ -23,6 +23,7 @@ public enum ErrorCode {
     EMAIL_EXISTED(409, "Email already exists", HttpStatus.CONFLICT),
     PATIENT_NOT_FOUND(404, "Patient not found", HttpStatus.NOT_FOUND),
     DOCTOR_NOT_FOUND(404, "Doctor not found", HttpStatus.NOT_FOUND),
+    DOCTOR_EXISTED(409, "Doctor already exists", HttpStatus.CONFLICT),
     SPECIALTY_NOT_FOUND(404, "Specialty not found", HttpStatus.NOT_FOUND),
     SPECIALTY_EXISTED(409, "Specialty already exists", HttpStatus.CONFLICT),
     UNIT_NOT_FOUND(404, "Unit not found", HttpStatus.NOT_FOUND),
@@ -46,7 +47,10 @@ public enum ErrorCode {
     PAYMENT_FAILED(400, "Payment failed", HttpStatus.BAD_REQUEST),
     REVIEW_NOT_FOUND(404, "Doctor review not found", HttpStatus.NOT_FOUND),
     REVIEW_EXISTED(409, "Doctor review already exists", HttpStatus.CONFLICT),
-    NOTIFICATION_NOT_FOUND(404, "Notification not found", HttpStatus.NOT_FOUND);
+    NOTIFICATION_NOT_FOUND(404, "Notification not found", HttpStatus.NOT_FOUND),
+    NOTIFICATION_TARGET_REQUIRED(400, "Target user or target role is required", HttpStatus.BAD_REQUEST),
+    SENDGRID_NOT_CONFIGURED(400, "SendGrid is not configured", HttpStatus.BAD_REQUEST),
+    EMAIL_SEND_FAILED(500, "Failed to send email", HttpStatus.INTERNAL_SERVER_ERROR);
 
     ErrorCode(int code, String message, HttpStatus httpStatus) {
         this.code = code;

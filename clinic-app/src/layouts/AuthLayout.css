@@ -1,0 +1,73 @@
+.auth-layout {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(145deg, #78cfdd 0%, #6cc5d8 55%, #72d6e2 100%);
+  overflow: hidden;
+}
+
+.auth-layout::after {
+  content: '';
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  bottom: -100px;
+  height: 220px;
+  background:
+    radial-gradient(140px 48px at 70px 50px, #111, transparent 70%),
+    repeating-radial-gradient(circle at 100px 70px, #9fb5c1 0 16px, #3b4c56 16px 33px);
+  opacity: 0.15;
+}
+
+.auth-layout__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.auth-layout__header {
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.auth-layout__bg-icon {
+  position: absolute;
+  z-index: 1;
+  color: rgba(255, 255, 255, 0.22);
+  line-height: 1;
+}
+
+.auth-layout__bg-icon--plus {
+  top: 14%;
+  left: 10%;
+  font-size: 74px;
+}
+
+.auth-layout__bg-icon--heart {
+  top: 22%;
+  right: 14%;
+  font-size: 66px;
+}
+
+.auth-layout__bg-icon--medical {
+  bottom: 20%;
+  right: 10%;
+  font-size: 90px;
+}
+
+@media (max-width: 768px) {
+  .auth-layout__bg-icon--plus {
+    font-size: 54px;
+  }
+
+  .auth-layout__bg-icon--heart {
+    font-size: 48px;
+  }
+
+  .auth-layout__bg-icon--medical {
+    font-size: 64px;
+  }
+}

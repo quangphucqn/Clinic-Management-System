@@ -41,6 +41,9 @@ public class Notification extends BaseEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     String content;
 
+    @Column(nullable = true)
+    Boolean emailSent = false;
+
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     UserRole targetRole;
@@ -48,13 +51,6 @@ public class Notification extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "target_user_id")
     Users targetUser;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    NotificationPriority priority;
-
-    @Column(nullable = false)
-    boolean pinned = false;
 
     LocalDateTime expiresAt;
 

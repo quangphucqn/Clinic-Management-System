@@ -1,0 +1,16 @@
+export const ROUTES = {
+  home: '/',
+  login: '/login',
+  register: '/register',
+  app: '/app',
+  profile: '/app/profile',
+  patientBook: '/app/patient/bookings/new',
+  patientAppointments: '/app/patient/appointments',
+  patientHistory: '/app/patient/history',
+  doctorSchedule: '/app/doctor/schedule',
+  adminTimeslots: '/app/admin/timeslots',
+  adminDoctors: '/app/admin/doctors',
+  adminNotifications: '/app/admin/notifications',
+  adminMedicineCategories: '/app/admin/medicine-categories',
+  adminMedicines: '/app/admin/medicines',
+}
