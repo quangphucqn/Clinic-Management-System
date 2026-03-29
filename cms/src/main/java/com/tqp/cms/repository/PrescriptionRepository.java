@@ -9,4 +9,8 @@ public interface PrescriptionRepository extends JpaRepository<Prescription, UUID
     Optional<Prescription> findByIdAndActiveTrue(UUID id);
 
     Optional<Prescription> findByMedicalRecordIdAndActiveTrue(UUID medicalRecordId);
+
+    boolean existsByMedicalRecordId(UUID medicalRecordId);
+
+    Optional<Prescription> findByMedicalRecordId(UUID medicalRecordId);
 }
