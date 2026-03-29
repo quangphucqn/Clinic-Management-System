@@ -20,9 +20,9 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AppointmentDoctorDetailsResponse {
     UUID id;
-    Patient patient;
-    Doctor doctor;
-    TimeSlotConfig timeSlotConfig;
+    PatientAppoinmentDoctorResponse patient;
+    UUID medicalRecordID;
+    String timeSlot;
     LocalDate appointmentDate;
     AppointmentStatus status;
     BigDecimal depositAmount;
