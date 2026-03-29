@@ -19,7 +19,4 @@ public class SpecialtyResponse {
     UUID id;
     String name;
     String description;
-    boolean active;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
 }

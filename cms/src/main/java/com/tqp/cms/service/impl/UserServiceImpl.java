@@ -22,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Sort;
 
 import java.util.UUID;
 
@@ -50,7 +51,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserResponse> getUsers(int page, int size, String username) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size,Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<com.tqp.cms.entity.Users> result;
         if (username != null && !username.isBlank()) {
             result = usersRepository.findByActiveTrueAndUsernameContainingIgnoreCase(username, pageable);

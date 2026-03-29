@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Sort;
 
 import java.util.UUID;
 
@@ -47,7 +48,7 @@ public class UnitServiceImpl implements UnitService {
 
     @Override
     public Page<UnitResponse> getUnits(int page, int size, String name) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size,Sort.by(Sort.Direction.DESC, "updatedAt"));
         Page<com.tqp.cms.entity.Unit> result;
         if (name != null && !name.isBlank()) {
             result = unitRepository.findByActiveTrueAndNameContainingIgnoreCase(name, pageable);
