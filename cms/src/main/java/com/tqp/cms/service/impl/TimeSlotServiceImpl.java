@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -47,7 +48,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
     @Override
     public Page<TimeSlotResponse> getTimeSlots(int page, int size, String slotCode) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size,Sort.by(Sort.Direction.DESC, "updatedAt"));
         Page<com.tqp.cms.entity.TimeSlotConfig> slotPage;
         if (slotCode != null && !slotCode.isBlank()) {
             slotPage = timeSlotConfigRepository.findByActiveTrueAndSlotCodeContainingIgnoreCase(slotCode, pageable);

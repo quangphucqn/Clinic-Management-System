@@ -19,9 +19,6 @@ public class SpecialtyMapper {
                 .id(specialty.getId())
                 .name(specialty.getName())
                 .description(specialty.getDescription())
-                .active(specialty.isActive())
-                .createdAt(specialty.getCreatedAt())
-                .updatedAt(specialty.getUpdatedAt())
                 .build();
     }
 }

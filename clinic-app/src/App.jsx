@@ -12,6 +12,10 @@ import PortalLayout from './layouts/PortalLayout.jsx'
 import HomePage from './pages/HomePage.jsx'
 import LoginPage from './pages/auth/LoginPage.jsx'
 import RegisterPage from './pages/auth/RegisterPage.jsx'
+import MedicineManagementPage from './pages/portal/admin/MedicineManagementPage.jsx'
+import SpecialtyManagementPage from './pages/portal/admin/SpecialtyManagementPage.jsx'
+import TimeSlotManagementPage from './pages/portal/admin/TimeSlotManagementPage.jsx'
+import UnitManagementPage from './pages/portal/admin/UnitManagementPage.jsx'
 import FeaturePage from './pages/portal/FeaturePage.jsx'
 import ProfilePage from './pages/portal/ProfilePage.jsx'
 
@@ -91,10 +95,15 @@ export default function App() {
                 path="admin/timeslots"
                 element={
                   <RequireRole roles={[ROLES.ADMIN]}>
-                    <FeaturePage
-                      title="Quản lý timeslot"
-                      description="Quản trị viên cấu hình khung giờ khám cho hệ thống."
-                    />
+                    <TimeSlotManagementPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="admin/specialties"
+                element={
+                  <RequireRole roles={[ROLES.ADMIN]}>
+                    <SpecialtyManagementPage />
                   </RequireRole>
                 }
               />
@@ -121,13 +130,10 @@ export default function App() {
                 }
               />
               <Route
-                path="admin/medicine-categories"
+                path="admin/units"
                 element={
                   <RequireRole roles={[ROLES.ADMIN]}>
-                    <FeaturePage
-                      title="Quản lý danh mục thuốc"
-                      description="Quản trị viên quản lý nhóm và phân loại thuốc."
-                    />
+                    <UnitManagementPage />
                   </RequireRole>
                 }
               />
@@ -135,10 +141,7 @@ export default function App() {
                 path="admin/medicines"
                 element={
                   <RequireRole roles={[ROLES.ADMIN]}>
-                    <FeaturePage
-                      title="Quản lý thuốc"
-                      description="Quản trị viên quản lý danh sách thuốc trong hệ thống."
-                    />
+                    <MedicineManagementPage />
                   </RequireRole>
                 }
               />
