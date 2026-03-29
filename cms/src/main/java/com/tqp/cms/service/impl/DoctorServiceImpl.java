@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -67,7 +68,7 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     public Page<DoctorResponse> getDoctors(int page, int size, String keyword) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size,Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Doctor> result;
         if (keyword != null && !keyword.isBlank()) {
             result = doctorRepository.searchActiveDoctors(keyword, pageable);

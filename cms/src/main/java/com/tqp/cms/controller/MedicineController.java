@@ -49,6 +49,21 @@ public class MedicineController {
         );
     }
 
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<MedicineResponse>> createMedicineWithOptionalImage(
+            @RequestPart("data") @Valid MedicineCreationRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file
+    ) {
+        MedicineResponse result = medicineService.createMedicine(request, file);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ApiResponse.<MedicineResponse>builder()
+                        .code(HttpStatus.CREATED.value())
+                        .message("Medicine created successfully")
+                        .result(result)
+                        .build()
+        );
+    }
+
     @GetMapping
     public ApiResponse<Page<MedicineResponse>> getMedicines(
             @RequestParam(defaultValue = "0") int page,
@@ -83,6 +98,19 @@ public class MedicineController {
                 .build();
     }
 
+    @PatchMapping(value = "/{medicineId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<MedicineResponse> updateMedicineWithOptionalImage(
+            @PathVariable UUID medicineId,
+            @RequestPart("data") @Valid MedicineUpdateRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file
+    ) {
+        return ApiResponse.<MedicineResponse>builder()
+                .code(HttpStatus.OK.value())
+                .message("Medicine updated successfully")
+                .result(medicineService.updateMedicine(medicineId, request, file))
+                .build();
+    }
+
     @DeleteMapping("/{medicineId}")
     public ResponseEntity<ApiResponse<Void>> softDeleteMedicine(@PathVariable UUID medicineId) {
         medicineService.softDeleteMedicine(medicineId);
@@ -94,18 +122,4 @@ public class MedicineController {
         );
     }
 
-    @PostMapping(value = "/{medicineId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<MedicineImageResponse>> uploadMedicineImage(
-            @PathVariable UUID medicineId,
-            @RequestPart("file") MultipartFile file
-    ) {
-        MedicineImageResponse result = medicineService.uploadMedicineImage(medicineId, file);
-        return ResponseEntity.status(HttpStatus.OK).body(
-                ApiResponse.<MedicineImageResponse>builder()
-                        .code(HttpStatus.OK.value())
-                        .message("Medicine image uploaded successfully")
-                        .result(result)
-                        .build()
-        );
-    }
 }

@@ -23,7 +23,4 @@ public class TimeSlotResponse {
     LocalTime endTime;
     Integer maxPatientsPerSlot;
     boolean enabled;
-    boolean active;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
 }

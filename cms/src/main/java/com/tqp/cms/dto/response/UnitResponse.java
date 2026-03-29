@@ -18,7 +18,4 @@ import java.util.UUID;
 public class UnitResponse {
     UUID id;
     String name;
-    boolean active;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
 }
