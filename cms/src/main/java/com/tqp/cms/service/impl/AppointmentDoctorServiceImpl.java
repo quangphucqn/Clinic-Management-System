@@ -134,6 +134,9 @@ public class AppointmentDoctorServiceImpl implements AppointmentDoctorService {
                                 .numberPhone(appointment.getPatient().getUserAccount().getEmail())
                                 .build()
                 )
+                .medicalRecordID(appointment.getMedicalRecord() != null
+                        ? appointment.getMedicalRecord().getId()
+                        : null)
                 .appointmentDate(appointment.getAppointmentDate())
                 .timeSlot(appointment.getTimeSlotConfig().getStartTime() + " - " +
                         appointment.getTimeSlotConfig().getEndTime())
