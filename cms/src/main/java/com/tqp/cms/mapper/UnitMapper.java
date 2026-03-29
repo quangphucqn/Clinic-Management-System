@@ -17,9 +17,6 @@ public class UnitMapper {
         return UnitResponse.builder()
                 .id(unit.getId())
                 .name(unit.getName())
-                .active(unit.isActive())
-                .createdAt(unit.getCreatedAt())
-                .updatedAt(unit.getUpdatedAt())
                 .build();
     }
 }

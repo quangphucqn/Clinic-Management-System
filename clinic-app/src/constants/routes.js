@@ -10,7 +10,9 @@ export const ROUTES = {
   doctorSchedule: '/app/doctor/schedule',
   adminTimeslots: '/app/admin/timeslots',
   adminDoctors: '/app/admin/doctors',
+  adminSpecialties: '/app/admin/specialties',
   adminNotifications: '/app/admin/notifications',
+  adminUnits: '/app/admin/units',
   adminMedicineCategories: '/app/admin/medicine-categories',
   adminMedicines: '/app/admin/medicines',
 }

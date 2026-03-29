@@ -1,6 +1,8 @@
 import {
+  AppstoreOutlined,
   BellOutlined,
   CalendarOutlined,
+  ClusterOutlined,
   ClockCircleOutlined,
   FileTextOutlined,
   MedicineBoxOutlined,
@@ -49,12 +51,13 @@ function getMenuItemsByRole(role) {
 
   if (role === ROLES.ADMIN) {
     return [
-      { key: ROUTES.adminTimeslots, icon: <ClockCircleOutlined />, label: 'Quản lý timeslot' },
+      { key: ROUTES.adminTimeslots, icon: <ClockCircleOutlined />, label: 'Quản lý giờ khám' },
+      { key: ROUTES.adminSpecialties, icon: <ClusterOutlined />, label: 'Quản lý chuyên khoa' },
       { key: ROUTES.adminDoctors, icon: <TeamOutlined />, label: 'Quản lý bác sĩ' },
       { key: ROUTES.adminNotifications, icon: <BellOutlined />, label: 'Quản lý thông báo' },
       {
-        key: ROUTES.adminMedicineCategories,
-        icon: <MedicineBoxOutlined />,
+        key: ROUTES.adminUnits,
+        icon: <AppstoreOutlined />,
         label: 'Quản lý danh mục thuốc',
       },
       {

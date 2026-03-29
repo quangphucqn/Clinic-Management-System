@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -46,7 +47,7 @@ public class SpecialtyServiceImpl implements SpecialtyService {
 
     @Override
     public Page<SpecialtyResponse> getSpecialties(int page, int size, String name) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size,Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<com.tqp.cms.entity.Specialty> result;
         if (name != null && !name.isBlank()) {
             result = specialtyRepository.findByActiveTrueAndNameContainingIgnoreCase(name, pageable);
