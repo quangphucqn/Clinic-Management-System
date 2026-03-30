@@ -7,7 +7,7 @@ export default function ProfilePage() {
   const { currentUser } = useAuth()
 
   return (
-    <Space direction="vertical" style={{ width: '100%' }} size="middle">
+    <Space orientation="vertical" style={{ width: '100%' }} size="middle">
       <Card>
         <Title level={4}>Thông tin tài khoản</Title>
         <Descriptions column={1} bordered size="small">
