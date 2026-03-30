@@ -11,6 +11,7 @@ import com.tqp.cms.exception.ErrorCode;
 import com.tqp.cms.mapper.MedicalRecordDetailMapper;
 import com.tqp.cms.mapper.MedicalRecordMapper;
 import com.tqp.cms.repository.AppointmentRepository;
+import com.tqp.cms.repository.DoctorRepository;
 import com.tqp.cms.repository.MedicalRecordRepository;
 import com.tqp.cms.repository.UsersRepository;
 import com.tqp.cms.service.MedicalRecordService;
@@ -33,6 +34,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     MedicalRecordRepository medicalRecordRepository;
     MedicalRecordMapper medicalRecordMapper;
     UsersRepository usersRepository;
+    DoctorRepository doctorRepository;
     MedicalRecordDetailMapper medicalRecordDetailMapper;
 
 
@@ -45,7 +47,9 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         var user = usersRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        var doctor = user.getDoctorProfile();
+        var doctor = doctorRepository.findByUserAccountId(user.getId())
+                .filter(item -> item.isActive())
+                .orElseThrow(() -> new AppException(ErrorCode.DOCTOR_NOT_FOUND));
 
 
         Appointment appointment = appointmentRepository.findById(request.getAppointmentId())
