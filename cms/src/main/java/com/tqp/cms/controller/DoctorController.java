@@ -3,6 +3,7 @@ package com.tqp.cms.controller;
 import com.tqp.cms.dto.request.DoctorCreationRequest;
 import com.tqp.cms.dto.request.DoctorUpdateRequest;
 import com.tqp.cms.dto.response.ApiResponse;
+import com.tqp.cms.dto.response.DoctorDetailResponse;
 import com.tqp.cms.dto.response.DoctorResponse;
 import com.tqp.cms.service.DoctorService;
 import jakarta.validation.Valid;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
 import java.util.UUID;
 
 @RestController
@@ -35,10 +35,10 @@ public class DoctorController {
     DoctorService doctorService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<DoctorResponse>> createDoctor(@RequestBody @Valid DoctorCreationRequest request) {
-        DoctorResponse result = doctorService.createDoctor(request);
+    public ResponseEntity<ApiResponse<DoctorDetailResponse>> createDoctor(@RequestBody @Valid DoctorCreationRequest request) {
+        DoctorDetailResponse result = doctorService.createDoctor(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                ApiResponse.<DoctorResponse>builder()
+                ApiResponse.<DoctorDetailResponse>builder()
                         .code(HttpStatus.CREATED.value())
                         .message("Doctor created successfully")
                         .result(result)
@@ -62,9 +62,9 @@ public class DoctorController {
     }
 
     @GetMapping("/{doctorId}")
-    public ResponseEntity<ApiResponse<DoctorResponse>> getDoctorById(@PathVariable UUID doctorId) {
+    public ResponseEntity<ApiResponse<DoctorDetailResponse>> getDoctorById(@PathVariable UUID doctorId) {
         return ResponseEntity.ok(
-                ApiResponse.<DoctorResponse>builder()
+                ApiResponse.<DoctorDetailResponse>builder()
                         .code(HttpStatus.OK.value())
                         .message("Get doctor successfully")
                         .result(doctorService.getDoctorById(doctorId))
@@ -73,12 +73,12 @@ public class DoctorController {
     }
 
     @PatchMapping("/{doctorId}")
-    public ResponseEntity<ApiResponse<DoctorResponse>> updateDoctor(
+    public ResponseEntity<ApiResponse<DoctorDetailResponse>> updateDoctor(
             @PathVariable UUID doctorId,
             @RequestBody @Valid DoctorUpdateRequest request
     ) {
         return ResponseEntity.ok(
-                ApiResponse.<DoctorResponse>builder()
+                ApiResponse.<DoctorDetailResponse>builder()
                         .code(HttpStatus.OK.value())
                         .message("Doctor updated successfully")
                         .result(doctorService.updateDoctor(doctorId, request))

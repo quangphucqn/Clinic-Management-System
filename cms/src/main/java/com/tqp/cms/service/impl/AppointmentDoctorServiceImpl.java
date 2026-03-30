@@ -6,6 +6,7 @@ import com.tqp.cms.entity.Appointment;
 import com.tqp.cms.exception.AppException;
 import com.tqp.cms.exception.ErrorCode;
 import com.tqp.cms.repository.AppointmentRepository;
+import com.tqp.cms.repository.DoctorRepository;
 import com.tqp.cms.repository.UsersRepository;
 import com.tqp.cms.service.AppointmentDoctorService;
 import lombok.AccessLevel;
@@ -33,6 +34,7 @@ public class AppointmentDoctorServiceImpl implements AppointmentDoctorService {
 
     AppointmentRepository appointmentRepository;
     UsersRepository usersRepository;
+    DoctorRepository doctorRepository;
 
     @Override
     @PreAuthorize("hasRole('DOCTOR')")
@@ -44,7 +46,9 @@ public class AppointmentDoctorServiceImpl implements AppointmentDoctorService {
         var user = usersRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        var doctor = user.getDoctorProfile();
+        var doctor = doctorRepository.findByUserAccountId(user.getId())
+                .filter(item -> item.isActive())
+                .orElseThrow(() -> new AppException(ErrorCode.DOCTOR_NOT_FOUND));
 
         Pageable pageable = PageRequest.of(
                 request.getPage(),
@@ -120,7 +124,9 @@ public class AppointmentDoctorServiceImpl implements AppointmentDoctorService {
         var user = usersRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        var doctor = user.getDoctorProfile();
+        var doctor = doctorRepository.findByUserAccountId(user.getId())
+                .filter(item -> item.isActive())
+                .orElseThrow(() -> new AppException(ErrorCode.DOCTOR_NOT_FOUND));
 
         var appointment = appointmentRepository.findById(appointmentId)
                 .filter(m -> m.isActive())

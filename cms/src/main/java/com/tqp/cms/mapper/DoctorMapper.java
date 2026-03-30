@@ -1,13 +1,26 @@
 package com.tqp.cms.mapper;
 
+import com.tqp.cms.dto.response.DoctorDetailResponse;
 import com.tqp.cms.dto.response.DoctorResponse;
 import com.tqp.cms.entity.Doctor;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DoctorMapper {
-    public DoctorResponse toResponse(Doctor doctor) {
+    public DoctorResponse toBasicResponse(Doctor doctor) {
         return DoctorResponse.builder()
+                .id(doctor.getId())
+                .userId(doctor.getUserAccount() != null ? doctor.getUserAccount().getId() : null)
+                .fullName(doctor.getUserAccount() != null ? doctor.getUserAccount().getFullName() : null)
+                .specialtyId(doctor.getSpecialty() != null ? doctor.getSpecialty().getId() : null)
+                .specialtyName(doctor.getSpecialty() != null ? doctor.getSpecialty().getName() : null)
+                .roomNumber(doctor.getRoomNumber())
+                .yearsOfExperience(doctor.getYearsOfExperience())
+                .build();
+    }
+
+    public DoctorDetailResponse toDetailResponse(Doctor doctor) {
+        return DoctorDetailResponse.builder()
                 .id(doctor.getId())
                 .userId(doctor.getUserAccount() != null ? doctor.getUserAccount().getId() : null)
                 .username(doctor.getUserAccount() != null ? doctor.getUserAccount().getUsername() : null)

@@ -60,17 +60,6 @@ public class UnitController {
         );
     }
 
-    @GetMapping("/{unitId}")
-    public ResponseEntity<ApiResponse<UnitResponse>> getUnitById(@PathVariable UUID unitId) {
-        return ResponseEntity.ok(
-                ApiResponse.<UnitResponse>builder()
-                        .code(HttpStatus.OK.value())
-                        .message("Get unit successfully")
-                        .result(unitService.getUnitById(unitId))
-                        .build()
-        );
-    }
-
     @PatchMapping("/{unitId}")
     public ResponseEntity<ApiResponse<UnitResponse>> updateUnit(
             @PathVariable UUID unitId,

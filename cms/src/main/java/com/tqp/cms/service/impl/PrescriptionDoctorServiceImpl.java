@@ -33,6 +33,7 @@ public class PrescriptionDoctorServiceImpl implements PrescriptionDoctorService 
     PrescriptionItemRepository itemRepo;
     PrescriptionDoctorMapper mapper;
     UsersRepository usersRepository;
+    DoctorRepository doctorRepository;
 
     @Override
     public PrescriptionDoctorResponse createPrescription (PrescriptionDoctorRequest request) {
@@ -43,7 +44,9 @@ public class PrescriptionDoctorServiceImpl implements PrescriptionDoctorService 
         var user = usersRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        var doctor = user.getDoctorProfile();
+        var doctor = doctorRepository.findByUserAccountId(user.getId())
+                .filter(item -> item.isActive())
+                .orElseThrow(() -> new AppException(ErrorCode.DOCTOR_NOT_FOUND));
 
         MedicalRecord record = recordRepo.findById(request.getMedicalRecordId())
                 .orElseThrow(() -> new AppException(ErrorCode.MEDICAL_RECORD_NOT_FOUND));

@@ -47,9 +47,4 @@ public class Users extends BaseEntity {
     @Column(length = 15)
     String phoneNumber;
 
-    @OneToOne(mappedBy = "userAccount")
-    Patient patientProfile;
-
-    @OneToOne(mappedBy = "userAccount")
-    Doctor doctorProfile;
 }
