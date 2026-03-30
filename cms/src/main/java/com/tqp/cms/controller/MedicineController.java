@@ -3,7 +3,6 @@ package com.tqp.cms.controller;
 import com.tqp.cms.dto.request.MedicineCreationRequest;
 import com.tqp.cms.dto.request.MedicineUpdateRequest;
 import com.tqp.cms.dto.response.ApiResponse;
-import com.tqp.cms.dto.response.MedicineImageResponse;
 import com.tqp.cms.dto.response.MedicineResponse;
 import com.tqp.cms.exception.ErrorCode;
 import com.tqp.cms.service.MedicineService;
@@ -33,10 +32,10 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/medicines")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@PreAuthorize("hasRole('ADMIN')")
 public class MedicineController {
     MedicineService medicineService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ApiResponse<MedicineResponse>> createMedicine(@RequestBody @Valid MedicineCreationRequest request) {
         MedicineResponse result = medicineService.createMedicine(request);
@@ -49,6 +48,7 @@ public class MedicineController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<MedicineResponse>> createMedicineWithOptionalImage(
             @RequestPart("data") @Valid MedicineCreationRequest request,
@@ -64,6 +64,7 @@ public class MedicineController {
         );
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     @GetMapping
     public ApiResponse<Page<MedicineResponse>> getMedicines(
             @RequestParam(defaultValue = "0") int page,
@@ -77,6 +78,7 @@ public class MedicineController {
                 .build();
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     @GetMapping("/{medicineId}")
     public ApiResponse<MedicineResponse> getMedicineById(@PathVariable UUID medicineId) {
         return ApiResponse.<MedicineResponse>builder()
@@ -86,6 +88,7 @@ public class MedicineController {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{medicineId}")
     public ApiResponse<MedicineResponse> updateMedicine(
             @PathVariable UUID medicineId,
@@ -98,6 +101,7 @@ public class MedicineController {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping(value = "/{medicineId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<MedicineResponse> updateMedicineWithOptionalImage(
             @PathVariable UUID medicineId,
@@ -111,6 +115,7 @@ public class MedicineController {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{medicineId}")
     public ResponseEntity<ApiResponse<Void>> softDeleteMedicine(@PathVariable UUID medicineId) {
         medicineService.softDeleteMedicine(medicineId);
