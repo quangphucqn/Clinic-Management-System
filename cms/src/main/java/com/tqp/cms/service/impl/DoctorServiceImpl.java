@@ -2,8 +2,10 @@ package com.tqp.cms.service.impl;
 
 import com.tqp.cms.dto.request.DoctorCreationRequest;
 import com.tqp.cms.dto.request.DoctorUpdateRequest;
+import com.tqp.cms.dto.response.DoctorDetailResponse;
 import com.tqp.cms.dto.response.DoctorResponse;
 import com.tqp.cms.entity.Doctor;
+import com.tqp.cms.entity.Users;
 import com.tqp.cms.entity.UserRole;
 import com.tqp.cms.exception.AppException;
 import com.tqp.cms.exception.ErrorCode;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -32,27 +35,34 @@ public class DoctorServiceImpl implements DoctorService {
     UsersRepository usersRepository;
     SpecialtyRepository specialtyRepository;
     DoctorMapper doctorMapper;
+    PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
-    public DoctorResponse createDoctor(DoctorCreationRequest request) {
+    public DoctorDetailResponse createDoctor(DoctorCreationRequest request) {
         if (doctorRepository.existsByLicenseNumber(request.getLicenseNumber())) {
             throw new AppException(ErrorCode.DOCTOR_EXISTED);
         }
-        if (doctorRepository.existsByUserAccountId(request.getUserId())) {
-            throw new AppException(ErrorCode.DOCTOR_EXISTED);
+        if (usersRepository.existsByUsername(request.getUsername())) {
+            throw new AppException(ErrorCode.USER_EXISTED);
         }
-
-        var user = usersRepository.findById(request.getUserId())
-                .filter(item -> item.isActive())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if (usersRepository.existsByEmail(request.getEmail())) {
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
 
         var specialty = specialtyRepository.findById(request.getSpecialtyId())
                 .filter(item -> item.isActive())
                 .orElseThrow(() -> new AppException(ErrorCode.SPECIALTY_NOT_FOUND));
 
-        user.setRole(UserRole.DOCTOR);
-        usersRepository.save(user);
+        Users user = Users.builder()
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .fullName(request.getFullName())
+                .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
+                .role(UserRole.DOCTOR)
+                .build();
+        user = usersRepository.save(user);
 
         Doctor doctor = Doctor.builder()
                 .userAccount(user)
@@ -63,7 +73,7 @@ public class DoctorServiceImpl implements DoctorService {
                 .biography(request.getBiography())
                 .build();
 
-        return doctorMapper.toResponse(doctorRepository.save(doctor));
+        return doctorMapper.toDetailResponse(doctorRepository.save(doctor));
     }
 
     @Override
@@ -75,20 +85,20 @@ public class DoctorServiceImpl implements DoctorService {
         } else {
             result = doctorRepository.findByActiveTrue(pageable);
         }
-        return result.map(doctorMapper::toResponse);
+        return result.map(doctorMapper::toBasicResponse);
     }
 
     @Override
-    public DoctorResponse getDoctorById(UUID doctorId) {
+    public DoctorDetailResponse getDoctorById(UUID doctorId) {
         var doctor = doctorRepository.findById(doctorId)
                 .filter(item -> item.isActive())
                 .orElseThrow(() -> new AppException(ErrorCode.DOCTOR_NOT_FOUND));
-        return doctorMapper.toResponse(doctor);
+        return doctorMapper.toDetailResponse(doctor);
     }
 
     @Override
     @Transactional
-    public DoctorResponse updateDoctor(UUID doctorId, DoctorUpdateRequest request) {
+    public DoctorDetailResponse updateDoctor(UUID doctorId, DoctorUpdateRequest request) {
         var doctor = doctorRepository.findById(doctorId)
                 .filter(item -> item.isActive())
                 .orElseThrow(() -> new AppException(ErrorCode.DOCTOR_NOT_FOUND));
@@ -115,7 +125,7 @@ public class DoctorServiceImpl implements DoctorService {
             doctor.setBiography(request.getBiography());
         }
 
-        return doctorMapper.toResponse(doctorRepository.save(doctor));
+        return doctorMapper.toDetailResponse(doctorRepository.save(doctor));
     }
 
     @Override

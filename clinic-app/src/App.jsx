@@ -13,6 +13,7 @@ import HomePage from './pages/HomePage.jsx'
 import LoginPage from './pages/auth/LoginPage.jsx'
 import RegisterPage from './pages/auth/RegisterPage.jsx'
 import MedicineManagementPage from './pages/portal/admin/MedicineManagementPage.jsx'
+import DoctorManagementPage from './pages/portal/admin/DoctorManagementPage.jsx'
 import SpecialtyManagementPage from './pages/portal/admin/SpecialtyManagementPage.jsx'
 import TimeSlotManagementPage from './pages/portal/admin/TimeSlotManagementPage.jsx'
 import UnitManagementPage from './pages/portal/admin/UnitManagementPage.jsx'
@@ -111,10 +112,7 @@ export default function App() {
                 path="admin/doctors"
                 element={
                   <RequireRole roles={[ROLES.ADMIN]}>
-                    <FeaturePage
-                      title="Quản lý bác sĩ"
-                      description="Quản trị viên thêm/sửa thông tin bác sĩ, chuyên khoa."
-                    />
+                    <DoctorManagementPage />
                   </RequireRole>
                 }
               />

@@ -58,14 +58,6 @@ public class TimeSlotController {
                 .build();
     }
 
-    @GetMapping("/{timeSlotId}")
-    public ApiResponse<TimeSlotResponse> getTimeSlotById(@PathVariable UUID timeSlotId) {
-        return ApiResponse.<TimeSlotResponse>builder()
-                .code(HttpStatus.OK.value())
-                .message("Get time slot successfully")
-                .result(timeSlotService.getTimeSlotById(timeSlotId))
-                .build();
-    }
 
     @PatchMapping("/{timeSlotId}")
     public ApiResponse<TimeSlotResponse> updateTimeSlot(

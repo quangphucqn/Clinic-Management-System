@@ -9,6 +9,7 @@ import com.tqp.cms.exception.AppException;
 import com.tqp.cms.exception.ErrorCode;
 import com.tqp.cms.mapper.LabTestMapper;
 import com.tqp.cms.mapper.LabTestOderMapper;
+import com.tqp.cms.repository.DoctorRepository;
 import com.tqp.cms.repository.LabTestOrderRepository;
 import com.tqp.cms.repository.MedicalRecordRepository;
 import com.tqp.cms.repository.UsersRepository;
@@ -32,6 +33,7 @@ public class LabTestOrderServiceImpl implements LabTestOrderService {
     LabTestOderMapper labTestOderMapper;
     LabTestMapper labTestMapper;
     UsersRepository usersRepository;
+    DoctorRepository doctorRepository;
 
 
     @Override
@@ -43,7 +45,9 @@ public class LabTestOrderServiceImpl implements LabTestOrderService {
         var user = usersRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        var doctor = user.getDoctorProfile();
+        var doctor = doctorRepository.findByUserAccountId(user.getId())
+                .filter(item -> item.isActive())
+                .orElseThrow(() -> new AppException(ErrorCode.DOCTOR_NOT_FOUND));
 
         MedicalRecord record = medicalRecordRepository.findById(request.getMedicalRecordId())
                 .orElseThrow(() -> new AppException(ErrorCode.MEDICAL_RECORD_NOT_FOUND));
