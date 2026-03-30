@@ -76,6 +76,13 @@ public class AppointmentDoctorServiceImpl implements AppointmentDoctorService {
                             request.getStatus(),
                             pageable
                     );
+        } else if (request.getPatientName() != null && !request.getPatientName().isBlank()) {
+            appointments = appointmentRepository
+                    .findByDoctorIdAndPatient_UserAccount_FullNameContainingIgnoreCase(
+                            doctor.getId(),
+                            request.getPatientName(),
+                            pageable
+                    );
         } else {
             appointments = appointmentRepository
                     .findByDoctorId(doctor.getId(), pageable);

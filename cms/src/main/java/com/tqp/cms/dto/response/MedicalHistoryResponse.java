@@ -15,9 +15,9 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MedicalHistoryResponse {
     UUID medicalRecordId;
-    String doctorName;
-    String diagnosis;
     LocalDateTime visitedAt;
-    PrescriptionResponse prescription;
-    List<LabTestOrderResponse> labTests;
+    String diagnosis;
+    String doctorName;
+    UUID prescriptionId;
+    List<UUID> labTestOrderIds;
 }

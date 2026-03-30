@@ -1,6 +1,5 @@
 package com.tqp.cms.dto.response;
 
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,11 +8,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PrescriptionItemDoctorResponse {
-    String medicineName;
-    Integer quantity;
-    String dosage;
-    String frequency;
-    Integer durationDays;
-    String note;
+public class LabTestResultResponse {
+    String resultValue;
+    String normalRange;
+    String attachmentUrl;
 }

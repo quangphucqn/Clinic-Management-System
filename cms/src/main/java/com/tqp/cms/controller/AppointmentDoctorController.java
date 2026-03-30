@@ -29,7 +29,8 @@ public class AppointmentDoctorController {
     MedicalRecordService medicalRecordService;
     PrescriptionDoctorService prescriptionDoctorService;
     LabTestOrderService labTestOrderService;
-    private final LabTestResultService labTestResultService;
+    LabTestResultService labTestResultService;
+    MedicalHistoryService medicalHistoryService;
 
 
     @GetMapping("/appointments")
@@ -82,6 +83,16 @@ public class AppointmentDoctorController {
                 .build();
     }
 
+    @GetMapping("/prescriptions/{prescriptionId}")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ApiResponse<PrescriptionDoctorResponse> getPrescriptionById(@PathVariable UUID prescriptionId) {
+        return ApiResponse.<PrescriptionDoctorResponse>builder()
+                .code(HttpStatus.OK.value())
+                .message("get prescription successfully")
+                .result(prescriptionDoctorService.getPrescriptionById(prescriptionId))
+                .build();
+    }
+
     @PostMapping("/lab-tests")
     @PreAuthorize("hasRole('DOCTOR')")
     public ApiResponse<LabTestOrderResponse> createLabTestOrder(@RequestBody @Valid LabTestOrderRequest request) {
@@ -91,12 +102,34 @@ public class AppointmentDoctorController {
                 .result(labTestOrderService.createLabTestOrder(request))
                 .build();
     }
+
+    @GetMapping("/lab-tests/{labTestOrderId}")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ApiResponse<LabTestOrderDetailResponse> getLabTestOrderById(@PathVariable UUID labTestOrderId) {
+        return ApiResponse.<LabTestOrderDetailResponse>builder()
+                .code(HttpStatus.OK.value())
+                .message("get lab test order successfully")
+                .result(labTestOrderService.getLabTestOrderById(labTestOrderId))
+                .build();
+    }
+
     @PostMapping("/lab-results")
     public ApiResponse<?> createResult(@RequestBody LabTestResultRequest request) {
         return ApiResponse.builder()
                 .code(HttpStatus.OK.value())
                 .message("create lab test results successfully")
                 .result(labTestResultService.createLabTestResult(request))
+                .build();
+    }
+
+    @GetMapping("/patients/{patientId}/medical-history")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ApiResponse<PageResponse<MedicalHistoryResponse>> getHistory(@PathVariable UUID patientId,
+                                                                @ModelAttribute MedicalHistoryRequest request) {
+        return ApiResponse.<PageResponse<MedicalHistoryResponse>>builder()
+                .code(HttpStatus.OK.value())
+                .message("get medical history successfully")
+                .result(medicalHistoryService.getPatientHistory(patientId,request))
                 .build();
     }
 }

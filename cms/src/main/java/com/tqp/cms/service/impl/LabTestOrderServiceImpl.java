@@ -1,10 +1,13 @@
 package com.tqp.cms.service.impl;
 
 import com.tqp.cms.dto.request.LabTestOrderRequest;
+import com.tqp.cms.dto.response.LabTestOrderDetailResponse;
 import com.tqp.cms.dto.response.LabTestOrderResponse;
+import com.tqp.cms.entity.LabTestOrder;
 import com.tqp.cms.entity.MedicalRecord;
 import com.tqp.cms.exception.AppException;
 import com.tqp.cms.exception.ErrorCode;
+import com.tqp.cms.mapper.LabTestMapper;
 import com.tqp.cms.mapper.LabTestOderMapper;
 import com.tqp.cms.repository.LabTestOrderRepository;
 import com.tqp.cms.repository.MedicalRecordRepository;
@@ -15,6 +18,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 
 @Service
@@ -24,7 +30,9 @@ public class LabTestOrderServiceImpl implements LabTestOrderService {
     MedicalRecordRepository medicalRecordRepository;
     LabTestOrderRepository labTestOrderRepository;
     LabTestOderMapper labTestOderMapper;
+    LabTestMapper labTestMapper;
     UsersRepository usersRepository;
+
 
     @Override
     public LabTestOrderResponse createLabTestOrder(LabTestOrderRequest request) {
@@ -49,6 +57,14 @@ public class LabTestOrderServiceImpl implements LabTestOrderService {
                         labTestOderMapper.toEntity(request, record, record.getPatient(), doctor)
                 )
         );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public LabTestOrderDetailResponse getLabTestOrderById(UUID id) {
+        LabTestOrder order = labTestOrderRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.LAB_TEST_ORDER_NOT_FOUND));
+        return labTestMapper.toDetailResponse(order);
     }
 
 }

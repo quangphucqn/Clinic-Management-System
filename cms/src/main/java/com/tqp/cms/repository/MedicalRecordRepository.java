@@ -1,10 +1,12 @@
 package com.tqp.cms.repository;
 
 import com.tqp.cms.entity.MedicalRecord;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,8 +14,7 @@ import java.util.UUID;
 public interface MedicalRecordRepository extends JpaRepository<MedicalRecord, UUID> {
 
     boolean existsByAppointmentId(UUID appointmentId);
-
-    List<MedicalRecord> findByPatientIdOrderByVisitedAtDesc(UUID patientId);
+    Page<MedicalRecord> findByPatientId(UUID patientId, Pageable pageable);
 
     @EntityGraph(attributePaths = {
             "doctor.userAccount",
