@@ -14,5 +14,7 @@ import java.util.UUID;
 public class PrescriptionDoctorResponse {
     UUID id;
     String patientName;
+    String doctorName;
+    String instructions;
     List<PrescriptionItemDoctorResponse> items;
 }

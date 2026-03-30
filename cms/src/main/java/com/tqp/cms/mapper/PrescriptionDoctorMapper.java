@@ -39,11 +39,16 @@ public class PrescriptionDoctorMapper {
         return PrescriptionDoctorResponse.builder()
                 .id(p.getId())
                 .patientName(p.getPatient().getUserAccount().getFullName())
+                .doctorName(p.getDoctor().getUserAccount().getFullName())
+                .instructions(p.getInstructions())
                 .items(p.getItems().stream().map(i ->
                         PrescriptionItemDoctorResponse.builder()
                                 .medicineName(i.getMedicine().getName())
                                 .quantity(i.getQuantity())
                                 .dosage(i.getDosage())
+                                .frequency(i.getFrequency())
+                                .durationDays(i.getDurationDays())
+                                .note(i.getNote())
                                 .build()
                 ).toList())
                 .build();
