@@ -1,19 +1,20 @@
 package com.tqp.cms.dto.response;
 
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PrescriptionItemDoctorResponse {
-    String medicineName;
-    Integer quantity;
-    String dosage;
-    String frequency;
-    Integer durationDays;
-    String note;
+public class LabTestOrderDetailResponse {
+    UUID id;
+    String testName;
+    String status;
+    String requestNote;
+
+    LabTestResultResponse result;
 }

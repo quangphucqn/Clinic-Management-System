@@ -16,8 +16,10 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -76,6 +78,13 @@ public class PrescriptionDoctorServiceImpl implements PrescriptionDoctorService 
         savedPrescription.setItems(items);
 
         return mapper.toResponse(savedPrescription);
+    }
+
+    @Transactional(readOnly = true)
+    public PrescriptionDoctorResponse getPrescriptionById(UUID id) {
+        Prescription prescription = prescriptionRepo.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.PRESCRIPTION_NOT_FOUND));
+        return mapper.toResponse(prescription);
     }
 }
 

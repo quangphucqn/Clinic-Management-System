@@ -37,4 +37,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
             Pageable pageable
     );
 
+    Page<Appointment> findByDoctorIdAndPatient_UserAccount_FullNameContainingIgnoreCase(
+            UUID doctorId,
+            String fullName,
+            Pageable pageable
+    );
+
+
 }
