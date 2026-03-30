@@ -11,11 +11,15 @@ import org.springframework.web.multipart.MultipartFile;
 public interface MedicineService {
     MedicineResponse createMedicine(MedicineCreationRequest request);
 
+    MedicineResponse createMedicine(MedicineCreationRequest request, MultipartFile file);
+
     MedicineResponse getMedicineById(UUID medicineId);
 
     Page<MedicineResponse> getMedicines(int page, int size, String name);
 
     MedicineResponse updateMedicine(UUID medicineId, MedicineUpdateRequest request);
+
+    MedicineResponse updateMedicine(UUID medicineId, MedicineUpdateRequest request, MultipartFile file);
 
     void softDeleteMedicine(UUID medicineId);
 

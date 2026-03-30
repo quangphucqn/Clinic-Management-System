@@ -25,9 +25,6 @@ public class TimeSlotMapper {
                 .endTime(entity.getEndTime())
                 .maxPatientsPerSlot(entity.getMaxPatientsPerSlot())
                 .enabled(entity.isEnabled())
-                .active(entity.isActive())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 }

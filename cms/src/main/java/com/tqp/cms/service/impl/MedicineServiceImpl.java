@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,12 +36,24 @@ public class MedicineServiceImpl implements MedicineService {
     @Override
     @Transactional
     public MedicineResponse createMedicine(MedicineCreationRequest request) {
+        return createMedicine(request, null);
+    }
+
+    @Override
+    @Transactional
+    public MedicineResponse createMedicine(MedicineCreationRequest request, MultipartFile file) {
         if (medicineRepository.existsByCode(request.getCode())) {
             throw new AppException(ErrorCode.MEDICINE_EXISTED);
         }
         var medicine = medicineMapper.toMedicine(request);
         medicine.setUnit(resolveOrCreateUnit(request.getUnitName()));
-        return medicineMapper.toMedicineResponse(medicineRepository.save(medicine));
+        var savedMedicine = medicineRepository.save(medicine);
+        if (file != null && !file.isEmpty()) {
+            uploadMedicineImage(savedMedicine.getId(), file);
+            savedMedicine = medicineRepository.findById(savedMedicine.getId())
+                    .orElseThrow(() -> new AppException(ErrorCode.MEDICINE_NOT_FOUND));
+        }
+        return medicineMapper.toMedicineResponse(savedMedicine);
     }
 
     @Override
@@ -53,7 +66,7 @@ public class MedicineServiceImpl implements MedicineService {
 
     @Override
     public Page<MedicineResponse> getMedicines(int page, int size, String name) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size,Sort.by(Sort.Direction.DESC, "updatedAt"));
         Page<com.tqp.cms.entity.Medicine> medicines;
         if (name != null && !name.isBlank()) {
             medicines = medicineRepository.findByActiveTrueAndNameContainingIgnoreCase(name, pageable);
@@ -66,6 +79,12 @@ public class MedicineServiceImpl implements MedicineService {
     @Override
     @Transactional
     public MedicineResponse updateMedicine(UUID medicineId, MedicineUpdateRequest request) {
+        return updateMedicine(medicineId, request, null);
+    }
+
+    @Override
+    @Transactional
+    public MedicineResponse updateMedicine(UUID medicineId, MedicineUpdateRequest request, MultipartFile file) {
         var medicine = medicineRepository.findById(medicineId)
                 .filter(m -> m.isActive())
                 .orElseThrow(() -> new AppException(ErrorCode.MEDICINE_NOT_FOUND));
@@ -95,7 +114,14 @@ public class MedicineServiceImpl implements MedicineService {
             medicine.setImageUrl(request.getImageUrl());
         }
 
-        return medicineMapper.toMedicineResponse(medicineRepository.save(medicine));
+        var savedMedicine = medicineRepository.save(medicine);
+        if (file != null && !file.isEmpty()) {
+            uploadMedicineImage(savedMedicine.getId(), file);
+            savedMedicine = medicineRepository.findById(savedMedicine.getId())
+                    .orElseThrow(() -> new AppException(ErrorCode.MEDICINE_NOT_FOUND));
+        }
+
+        return medicineMapper.toMedicineResponse(savedMedicine);
     }
 
     @Override
