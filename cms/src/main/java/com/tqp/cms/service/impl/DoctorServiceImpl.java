@@ -77,11 +77,15 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
-    public Page<DoctorResponse> getDoctors(int page, int size, String keyword) {
+    public Page<DoctorResponse> getDoctors(int page, int size, String keyword, UUID specialtyId) {
         Pageable pageable = PageRequest.of(page, size,Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Doctor> result;
-        if (keyword != null && !keyword.isBlank()) {
+        if (keyword != null && !keyword.isBlank() && specialtyId != null) {
+            result = doctorRepository.searchActiveDoctorsBySpecialty(keyword, specialtyId, pageable);
+        } else if (keyword != null && !keyword.isBlank()) {
             result = doctorRepository.searchActiveDoctors(keyword, pageable);
+        } else if (specialtyId != null) {
+            result = doctorRepository.findByActiveTrueAndSpecialtyId(specialtyId, pageable);
         } else {
             result = doctorRepository.findByActiveTrue(pageable);
         }

@@ -12,6 +12,7 @@
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
     "@fontsource/quicksand": "^5.2.10",
+    "@stomp/stompjs": "^7.3.0",
     "antd": "^6.3.4",
     "axios": "^1.13.6",
     "dayjs": "^1.11.20",

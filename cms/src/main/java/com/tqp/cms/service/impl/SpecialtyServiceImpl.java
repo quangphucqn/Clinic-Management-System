@@ -38,14 +38,6 @@ public class SpecialtyServiceImpl implements SpecialtyService {
     }
 
     @Override
-    public SpecialtyResponse getSpecialtyById(UUID specialtyId) {
-        var specialty = specialtyRepository.findById(specialtyId)
-                .filter(s -> s.isActive())
-                .orElseThrow(() -> new AppException(ErrorCode.SPECIALTY_NOT_FOUND));
-        return specialtyMapper.toResponse(specialty);
-    }
-
-    @Override
     public Page<SpecialtyResponse> getSpecialties(int page, int size, String name) {
         Pageable pageable = PageRequest.of(page, size,Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<com.tqp.cms.entity.Specialty> result;

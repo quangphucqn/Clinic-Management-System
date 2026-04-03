@@ -10,8 +10,6 @@ import java.util.UUID;
 public interface SpecialtyService {
     SpecialtyResponse createSpecialty(SpecialtyCreationRequest request);
 
-    SpecialtyResponse getSpecialtyById(UUID specialtyId);
-
     Page<SpecialtyResponse> getSpecialties(int page, int size, String name);
 
     SpecialtyResponse updateSpecialty(UUID specialtyId, SpecialtyUpdateRequest request);

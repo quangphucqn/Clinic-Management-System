@@ -50,13 +50,14 @@ public class DoctorController {
     public ResponseEntity<ApiResponse<Page<DoctorResponse>>> getDoctors(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String keyword
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) UUID specialtyId
     ) {
         return ResponseEntity.ok(
                 ApiResponse.<Page<DoctorResponse>>builder()
                         .code(HttpStatus.OK.value())
                         .message("Get doctors successfully")
-                        .result(doctorService.getDoctors(page, size, keyword))
+                        .result(doctorService.getDoctors(page, size, keyword, specialtyId))
                         .build()
         );
     }
