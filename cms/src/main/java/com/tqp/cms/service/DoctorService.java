@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface DoctorService {
     DoctorDetailResponse createDoctor(DoctorCreationRequest request);
 
-    Page<DoctorResponse> getDoctors(int page, int size, String keyword);
+    Page<DoctorResponse> getDoctors(int page, int size, String keyword, UUID specialtyId);
 
     DoctorDetailResponse getDoctorById(UUID doctorId);
 

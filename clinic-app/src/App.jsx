@@ -14,6 +14,7 @@ import LoginPage from './pages/auth/LoginPage.jsx'
 import RegisterPage from './pages/auth/RegisterPage.jsx'
 import MedicineManagementPage from './pages/portal/admin/MedicineManagementPage.jsx'
 import DoctorManagementPage from './pages/portal/admin/DoctorManagementPage.jsx'
+import NotificationManagementPage from './pages/portal/admin/NotificationManagementPage.jsx'
 import SpecialtyManagementPage from './pages/portal/admin/SpecialtyManagementPage.jsx'
 import TimeSlotManagementPage from './pages/portal/admin/TimeSlotManagementPage.jsx'
 import UnitManagementPage from './pages/portal/admin/UnitManagementPage.jsx'
@@ -24,7 +25,12 @@ export default function App() {
   return (
     <ConfigProvider
       locale={viVN}
-      theme={{ token: { fontFamily: "'Quicksand', system-ui, sans-serif" } }}
+      theme={{
+        token: {
+          fontFamily: "'Quicksand', system-ui, sans-serif",
+          colorPrimary: '#6cc5d8',
+        },
+      }}
     >
       <AuthProvider>
         <BrowserRouter>
@@ -120,10 +126,7 @@ export default function App() {
                 path="admin/notifications"
                 element={
                   <RequireRole roles={[ROLES.ADMIN]}>
-                    <FeaturePage
-                      title="Quản lý thông báo"
-                      description="Quản trị viên tạo và quản lý thông báo tới người dùng."
-                    />
+                    <NotificationManagementPage />
                   </RequireRole>
                 }
               />

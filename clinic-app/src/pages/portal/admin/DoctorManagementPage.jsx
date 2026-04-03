@@ -42,6 +42,7 @@ export default function DoctorManagementPage() {
   const [pageSize, setPageSize] = useState(10)
   const [keyword, setKeyword] = useState('')
   const [debouncedKeyword, setDebouncedKeyword] = useState('')
+  const [filterSpecialtyId, setFilterSpecialtyId] = useState(undefined)
   const [selectedDoctor, setSelectedDoctor] = useState(null)
   const [updateModalOpen, setUpdateModalOpen] = useState(false)
   const [createModalOpen, setCreateModalOpen] = useState(false)
@@ -52,6 +53,7 @@ export default function DoctorManagementPage() {
     nextPage = page,
     nextPageSize = pageSize,
     nextKeyword = debouncedKeyword,
+    nextSpecialtyId = filterSpecialtyId,
   } = {}) {
     setLoading(true)
     try {
@@ -59,6 +61,7 @@ export default function DoctorManagementPage() {
         page: nextPage - 1,
         size: nextPageSize,
         keyword: nextKeyword || undefined,
+        specialtyId: nextSpecialtyId || undefined,
       })
       const pageData = response?.result
       setDoctors(pageData?.content || [])
@@ -97,9 +100,19 @@ export default function DoctorManagementPage() {
 
   useEffect(() => {
     setPage(1)
-    loadDoctors({ nextPage: 1, nextPageSize: pageSize, nextKeyword: debouncedKeyword })
+    loadDoctors({
+      nextPage: 1,
+      nextPageSize: pageSize,
+      nextKeyword: debouncedKeyword,
+      nextSpecialtyId: filterSpecialtyId,
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedKeyword])
+  }, [debouncedKeyword, filterSpecialtyId])
+
+  useEffect(() => {
+    loadSpecialties()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function openDoctorDetail(doctorId) {
     setDetailLoading(true)
@@ -228,30 +241,52 @@ export default function DoctorManagementPage() {
       dataIndex: 'specialtyName',
       key: 'specialtyName',
     },
+    {
+      title: 'Chứng chỉ hành nghề',
+      dataIndex: 'licenseNumber',
+      key: 'licenseNumber',
+    },
   ]
 
   return (
     <Card>
       <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
-        <Space
-          style={{ width: '100%', justifyContent: 'space-between' }}
-          align="start"
-          wrap
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+          }}
         >
           <Title level={3} style={{ margin: 0 }}>
             Quản lý bác sĩ
           </Title>
-          <Input
-            placeholder="Tìm theo tên, username, email..."
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            allowClear
-            style={{ width: 280 }}
-          />
-          <Button type="primary" onClick={openCreateModal}>
-            Thêm bác sĩ
-          </Button>
-        </Space>
+          <Space size="small" style={{ marginLeft: 'auto' }}>
+            <Input
+              placeholder="Tìm theo tên, chứng chỉ hành nghề..."
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              allowClear
+              style={{ width: 280 }}
+            />
+            <Select
+              placeholder="Lọc theo chuyên khoa"
+              allowClear
+              showSearch
+              optionFilterProp="label"
+              options={specialtyOptions}
+              loading={specialtyLoading}
+              value={filterSpecialtyId}
+              onChange={(value) => setFilterSpecialtyId(value)}
+              style={{ width: 240 }}
+            />
+            <Button type="primary" onClick={openCreateModal}>
+              Thêm bác sĩ
+            </Button>
+          </Space>
+        </div>
 
         <Table
           rowKey="id"
@@ -270,7 +305,11 @@ export default function DoctorManagementPage() {
             const nextPageSize = pagination.pageSize || 10
             setPage(nextPage)
             setPageSize(nextPageSize)
-            loadDoctors({ nextPage, nextPageSize })
+            loadDoctors({
+              nextPage,
+              nextPageSize,
+              nextSpecialtyId: filterSpecialtyId,
+            })
           }}
         />
       </Space>

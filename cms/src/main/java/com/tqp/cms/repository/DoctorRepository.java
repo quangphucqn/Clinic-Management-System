@@ -26,6 +26,9 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
     Page<Doctor> findByActiveTrue(Pageable pageable);
 
     @EntityGraph(attributePaths = {"userAccount", "specialty"})
+    Page<Doctor> findByActiveTrueAndSpecialtyId(UUID specialtyId, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"userAccount", "specialty"})
     @Query("""
             select d from Doctor d
             where d.active = true
@@ -35,6 +38,22 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
               )
             """)
     Page<Doctor> searchActiveDoctors(@Param("keyword") String keyword, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"userAccount", "specialty"})
+    @Query("""
+            select d from Doctor d
+            where d.active = true
+              and d.specialty.id = :specialtyId
+              and (
+                   lower(d.licenseNumber) like lower(concat('%', :keyword, '%'))
+                   or lower(d.userAccount.fullName) like lower(concat('%', :keyword, '%'))
+              )
+            """)
+    Page<Doctor> searchActiveDoctorsBySpecialty(
+            @Param("keyword") String keyword,
+            @Param("specialtyId") UUID specialtyId,
+            Pageable pageable
+    );
 
     @Query("""
             select d.userAccount.id

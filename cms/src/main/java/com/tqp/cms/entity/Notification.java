@@ -52,8 +52,6 @@ public class Notification extends BaseEntity {
     @JoinColumn(name = "target_user_id")
     Users targetUser;
 
-    LocalDateTime expiresAt;
-
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     LocalDateTime createdAt;

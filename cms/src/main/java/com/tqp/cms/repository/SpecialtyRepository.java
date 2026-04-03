@@ -13,8 +13,6 @@ public interface SpecialtyRepository extends JpaRepository<Specialty, UUID> {
 
     boolean existsByNameAndIdNot(String name, UUID id);
 
-    Optional<Specialty> findByName(String name);
-
     Page<Specialty> findByActiveTrue(Pageable pageable);
 
     Page<Specialty> findByActiveTrueAndNameContainingIgnoreCase(String name, Pageable pageable);

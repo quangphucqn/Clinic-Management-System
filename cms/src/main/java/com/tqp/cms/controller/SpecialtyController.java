@@ -59,15 +59,6 @@ public class SpecialtyController {
                 .build();
     }
 
-    @GetMapping("/{specialtyId}")
-    public ApiResponse<SpecialtyResponse> getSpecialtyById(@PathVariable UUID specialtyId) {
-        return ApiResponse.<SpecialtyResponse>builder()
-                .code(HttpStatus.OK.value())
-                .message("Get specialty successfully")
-                .result(specialtyService.getSpecialtyById(specialtyId))
-                .build();
-    }
-
     @PatchMapping("/{specialtyId}")
     public ApiResponse<SpecialtyResponse> updateSpecialty(
             @PathVariable UUID specialtyId,
