@@ -10,8 +10,6 @@ import java.util.UUID;
 public interface UnitService {
     UnitResponse createUnit(UnitCreationRequest request);
 
-    UnitResponse getUnitById(UUID unitId);
-
     Page<UnitResponse> getUnits(int page, int size, String name);
 
     UnitResponse updateUnit(UUID unitId, UnitUpdateRequest request);

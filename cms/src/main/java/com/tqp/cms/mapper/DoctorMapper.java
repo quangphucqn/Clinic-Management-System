@@ -14,6 +14,7 @@ public class DoctorMapper {
                 .fullName(doctor.getUserAccount() != null ? doctor.getUserAccount().getFullName() : null)
                 .specialtyId(doctor.getSpecialty() != null ? doctor.getSpecialty().getId() : null)
                 .specialtyName(doctor.getSpecialty() != null ? doctor.getSpecialty().getName() : null)
+                .licenseNumber(doctor.getLicenseNumber()!=null ? doctor.getLicenseNumber() : null)
                 .roomNumber(doctor.getRoomNumber())
                 .yearsOfExperience(doctor.getYearsOfExperience())
                 .build();

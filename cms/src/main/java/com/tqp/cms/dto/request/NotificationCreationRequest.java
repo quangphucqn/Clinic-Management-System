@@ -29,7 +29,5 @@ public class NotificationCreationRequest {
 
     UUID targetUserId;
 
-    LocalDateTime expiresAt;
-
     Boolean sentEmail;
 }
