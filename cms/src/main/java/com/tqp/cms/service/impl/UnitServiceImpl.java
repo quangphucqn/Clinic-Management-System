@@ -38,13 +38,6 @@ public class UnitServiceImpl implements UnitService {
         return unitMapper.toResponse(saved);
     }
 
-    @Override
-    public UnitResponse getUnitById(UUID unitId) {
-        var unit = unitRepository.findById(unitId)
-                .filter(item -> item.isActive())
-                .orElseThrow(() -> new AppException(ErrorCode.UNIT_NOT_FOUND));
-        return unitMapper.toResponse(unit);
-    }
 
     @Override
     public Page<UnitResponse> getUnits(int page, int size, String name) {

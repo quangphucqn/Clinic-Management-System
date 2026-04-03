@@ -21,5 +21,6 @@ public class DoctorResponse {
     UUID specialtyId;
     String specialtyName;
     String roomNumber;
+    String licenseNumber;
     Integer yearsOfExperience;
 }
