@@ -43,5 +43,21 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
             Pageable pageable
     );
 
+    boolean existsByDoctorIdAndAppointmentDateAndTimeSlotConfigIdAndActiveTrue(
+            UUID doctorId,
+            LocalDate appointmentDate,
+            UUID timeSlotConfigId
+    );
+
+    boolean existsByPatientIdAndDoctorIdAndAppointmentDateAndTimeSlotConfigIdAndActiveTrue(
+            UUID patientId,
+            UUID doctorId,
+            LocalDate appointmentDate,
+            UUID timeSlotConfigId
+    );
+
+    Page<Appointment> findByPatientIdAndActiveTrue(UUID patientId, Pageable pageable);
+
+    Page<Appointment> findByPatientIdAndStatusAndActiveTrue(UUID patientId, AppointmentStatus status, Pageable pageable);
 
 }
