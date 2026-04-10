@@ -1,8 +1,8 @@
 package com.tqp.cms.dto.response;
 
-import com.tqp.cms.entity.UserRole;
 import java.time.LocalDateTime;
 import java.util.UUID;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,16 +15,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class NotificationResponse {
+public class NotificationListResponse {
     UUID id;
     String title;
-    String content;
-    Boolean emailSent;
-    UserRole targetRole;
-    UUID targetUserId;
-    String targetUsername;
-    String targetUserEmail;
-    boolean active;
     LocalDateTime createdAt;
-    LocalDateTime updatedAt;
 }
