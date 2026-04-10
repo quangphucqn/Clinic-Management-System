@@ -3,6 +3,7 @@ package com.tqp.cms.controller;
 import com.tqp.cms.dto.request.NotificationCreationRequest;
 import com.tqp.cms.dto.request.NotificationUpdateRequest;
 import com.tqp.cms.dto.response.ApiResponse;
+import com.tqp.cms.dto.response.NotificationListResponse;
 import com.tqp.cms.dto.response.NotificationResponse;
 import com.tqp.cms.service.NotificationService;
 import jakarta.validation.Valid;
@@ -47,12 +48,12 @@ public class NotificationController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ApiResponse<Page<NotificationResponse>> getNotifications(
+    public ApiResponse<Page<NotificationListResponse>> getNotifications(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String title
     ) {
-        return ApiResponse.<Page<NotificationResponse>>builder()
+        return ApiResponse.<Page<NotificationListResponse>>builder()
                 .code(HttpStatus.OK.value())
                 .message("Get notifications successfully")
                 .result(notificationService.getNotifications(page, size, title))
@@ -60,7 +61,7 @@ public class NotificationController {
     }
 
     @GetMapping("/{notificationId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ApiResponse<NotificationResponse> getNotificationById(@PathVariable UUID notificationId) {
         return ApiResponse.<NotificationResponse>builder()
                 .code(HttpStatus.OK.value())
@@ -96,11 +97,11 @@ public class NotificationController {
 
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public ApiResponse<Page<NotificationResponse>> getMyNotifications(
+    public ApiResponse<Page<NotificationListResponse>> getMyNotifications(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return ApiResponse.<Page<NotificationResponse>>builder()
+        return ApiResponse.<Page<NotificationListResponse>>builder()
                 .code(HttpStatus.OK.value())
                 .message("Get my notifications successfully")
                 .result(notificationService.getMyNotifications(page, size))

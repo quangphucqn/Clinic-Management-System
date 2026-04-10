@@ -18,7 +18,6 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
     @Query("""
             select n from Notification n
             where n.active = true
-              and (n.expiresAt is null or n.expiresAt >= :now)
               and (n.targetUser.id = :userId or n.targetRole = :role)
             """)
     Page<Notification> findMyNotifications(
