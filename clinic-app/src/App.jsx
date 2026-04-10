@@ -17,6 +17,8 @@ import DoctorManagementPage from './pages/portal/admin/DoctorManagementPage.jsx'
 import SpecialtyManagementPage from './pages/portal/admin/SpecialtyManagementPage.jsx'
 import TimeSlotManagementPage from './pages/portal/admin/TimeSlotManagementPage.jsx'
 import UnitManagementPage from './pages/portal/admin/UnitManagementPage.jsx'
+import AppointmentBookingPage from './pages/portal/patient/AppointmentBookingPage.jsx'
+import PatientPrescriptionPage from './pages/portal/patient/PatientPrescriptionPage.jsx'
 import FeaturePage from './pages/portal/FeaturePage.jsx'
 import ProfilePage from './pages/portal/ProfilePage.jsx'
 
@@ -50,10 +52,7 @@ export default function App() {
                 path="patient/bookings/new"
                 element={
                   <RequireRole roles={[ROLES.PATIENT]}>
-                    <FeaturePage
-                      title="Đặt khám"
-                      description="Bệnh nhân có thể chọn bác sĩ, khung giờ và tạo lịch khám tại đây."
-                    />
+                    <AppointmentBookingPage />
                   </RequireRole>
                 }
               />
@@ -72,10 +71,7 @@ export default function App() {
                 path="patient/history"
                 element={
                   <RequireRole roles={[ROLES.PATIENT]}>
-                    <FeaturePage
-                      title="Lịch sử khám"
-                      description="Bệnh nhân xem lại các lần khám và kết quả trước đây."
-                    />
+                    <PatientPrescriptionPage />
                   </RequireRole>
                 }
               />
