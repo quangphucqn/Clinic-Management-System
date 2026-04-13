@@ -23,4 +23,3 @@ export async function updateDoctor(doctorId, payload) {
 export async function deleteDoctor(doctorId) {
   await api.delete(`/doctors/${doctorId}`)
 }
-

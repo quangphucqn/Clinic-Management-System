@@ -8,6 +8,8 @@ export const ROUTES = {
   patientAppointments: '/app/patient/appointments',
   patientHistory: '/app/patient/history',
   doctorSchedule: '/app/doctor/schedule',
+  doctorPatientHistory: '/app/doctor/patient-history',
+  doctorExamination: (appointmentId) => `/app/doctor/schedule/${appointmentId}/examination`,
   adminTimeslots: '/app/admin/timeslots',
   adminDoctors: '/app/admin/doctors',
   adminSpecialties: '/app/admin/specialties',
