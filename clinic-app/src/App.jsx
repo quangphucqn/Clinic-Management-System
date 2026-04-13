@@ -18,6 +18,9 @@ import NotificationManagementPage from './pages/portal/admin/NotificationManagem
 import SpecialtyManagementPage from './pages/portal/admin/SpecialtyManagementPage.jsx'
 import TimeSlotManagementPage from './pages/portal/admin/TimeSlotManagementPage.jsx'
 import UnitManagementPage from './pages/portal/admin/UnitManagementPage.jsx'
+import DoctorExaminationPage from './pages/portal/doctor/DoctorExaminationPage.jsx'
+import DoctorPatientHistoryPage from './pages/portal/doctor/DoctorPatientHistoryPage.jsx'
+import DoctorSchedulePage from './pages/portal/doctor/DoctorSchedulePage.jsx'
 import FeaturePage from './pages/portal/FeaturePage.jsx'
 import ProfilePage from './pages/portal/ProfilePage.jsx'
 
@@ -90,10 +93,23 @@ export default function App() {
                 path="doctor/schedule"
                 element={
                   <RequireRole roles={[ROLES.DOCTOR]}>
-                    <FeaturePage
-                      title="Lịch khám bác sĩ"
-                      description="Bác sĩ theo dõi các lịch hẹn bệnh nhân theo từng ngày."
-                    />
+                    <DoctorSchedulePage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="doctor/schedule/:appointmentId/examination"
+                element={
+                  <RequireRole roles={[ROLES.DOCTOR]}>
+                    <DoctorExaminationPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="doctor/patient-history"
+                element={
+                  <RequireRole roles={[ROLES.DOCTOR]}>
+                    <DoctorPatientHistoryPage />
                   </RequireRole>
                 }
               />

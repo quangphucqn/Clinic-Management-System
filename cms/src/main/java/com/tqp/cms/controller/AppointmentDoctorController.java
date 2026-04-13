@@ -10,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -31,9 +32,12 @@ public class AppointmentDoctorController {
     LabTestOrderService labTestOrderService;
     LabTestResultService labTestResultService;
     MedicalHistoryService medicalHistoryService;
+    PatientDoctorService patientDoctorService;
+
 
 
     @GetMapping("/appointments")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ApiResponse<PageResponse<AppointmentDoctorResponse>> getMyAppointments(
             @Valid @ModelAttribute AppointmentDoctorRequest request
     ) {
@@ -45,6 +49,7 @@ public class AppointmentDoctorController {
     }
 
     @GetMapping("appointments/{appointmentId}")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ApiResponse<AppointmentDoctorDetailsResponse> getAppointmentById(@PathVariable UUID appointmentId) {
         return ApiResponse.<AppointmentDoctorDetailsResponse>builder()
                 .code(HttpStatus.OK.value())
@@ -131,5 +136,19 @@ public class AppointmentDoctorController {
                 .message("get medical history successfully")
                 .result(medicalHistoryService.getPatientHistory(patientId,request))
                 .build();
+    }
+
+    @GetMapping("/patients")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ApiResponse<PageResponse<PatientAppoinmentDoctorResponse>> getPatients(
+            @RequestParam(required = false) String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ApiResponse.<PageResponse<PatientAppoinmentDoctorResponse>>builder()
+                        .code(HttpStatus.OK.value())
+                        .message("Get patient successfully")
+                        .result(patientDoctorService.searchPatients(name, page, size))
+                        .build();
     }
 }

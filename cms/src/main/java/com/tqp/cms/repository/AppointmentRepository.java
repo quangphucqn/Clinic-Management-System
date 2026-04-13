@@ -43,5 +43,4 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
             Pageable pageable
     );
 
-
 }

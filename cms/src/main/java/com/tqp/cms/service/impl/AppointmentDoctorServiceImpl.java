@@ -106,8 +106,9 @@ public class AppointmentDoctorServiceImpl implements AppointmentDoctorService {
                 .id(appointment.getId())
                 .patient(
                         PatientAppoinmentDoctorResponse.builder()
+                                .patientId(appointment.getPatient().getId())
                                 .fullName(appointment.getPatient().getUserAccount().getFullName())
-                                .numberPhone(appointment.getPatient().getUserAccount().getEmail())
+                                .email(appointment.getPatient().getUserAccount().getEmail())
                                 .build()
                 )
                 .appointmentDate(appointment.getAppointmentDate())
@@ -143,8 +144,9 @@ public class AppointmentDoctorServiceImpl implements AppointmentDoctorService {
                 .id(appointment.getId())
                 .patient(
                         PatientAppoinmentDoctorResponse.builder()
+                                .patientId(appointment.getPatient().getId())
                                 .fullName(appointment.getPatient().getUserAccount().getFullName())
-                                .numberPhone(appointment.getPatient().getUserAccount().getEmail())
+                                .email(appointment.getPatient().getUserAccount().getEmail())
                                 .build()
                 )
                 .medicalRecordID(appointment.getMedicalRecord() != null
