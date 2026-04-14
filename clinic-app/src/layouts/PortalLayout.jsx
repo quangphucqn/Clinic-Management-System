@@ -70,7 +70,12 @@ function getMenuItemsByRole(role) {
       {
         key: ROUTES.doctorSchedule,
         icon: <CalendarOutlined />,
-        label: 'Lịch khám bác sĩ',
+        label: 'Lịch khám và khám bệnh',
+      },
+      {
+        key: ROUTES.doctorPatientHistory,
+        icon: <FileTextOutlined />,
+        label: 'Lịch sử khám bệnh nhân',
       },
     ]
   }
