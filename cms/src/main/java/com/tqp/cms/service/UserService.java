@@ -1,5 +1,6 @@
 package com.tqp.cms.service;
 
+import com.tqp.cms.dto.request.ChangePasswordRequest;
 import com.tqp.cms.dto.request.UserCreationRequest;
 import com.tqp.cms.dto.request.UserUpdateRequest;
 import com.tqp.cms.dto.response.CurrentUserProfileResponse;
@@ -16,6 +17,8 @@ public interface UserService {
     UserResponse getUserById(UUID userId);
 
     CurrentUserProfileResponse getCurrentUserProfile();
+
+    void changeMyPassword(ChangePasswordRequest request);
 
     UserResponse updateUser(UUID userId, UserUpdateRequest request);
 

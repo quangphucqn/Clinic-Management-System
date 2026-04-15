@@ -1,6 +1,7 @@
 package com.tqp.cms.service;
 
 import com.tqp.cms.dto.request.DoctorCreationRequest;
+import com.tqp.cms.dto.request.DoctorSelfUpdateRequest;
 import com.tqp.cms.dto.request.DoctorUpdateRequest;
 import com.tqp.cms.dto.response.DoctorDetailResponse;
 import com.tqp.cms.dto.response.DoctorResponse;
@@ -16,6 +17,8 @@ public interface DoctorService {
     DoctorDetailResponse getDoctorById(UUID doctorId);
 
     DoctorDetailResponse updateDoctor(UUID doctorId, DoctorUpdateRequest request);
+
+    DoctorDetailResponse updateMyProfile(DoctorSelfUpdateRequest request);
 
     void softDeleteDoctor(UUID doctorId);
 }

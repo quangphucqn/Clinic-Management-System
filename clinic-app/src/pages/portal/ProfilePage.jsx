@@ -11,9 +11,6 @@ export default function ProfilePage() {
       <Card>
         <Title level={4}>Thông tin tài khoản</Title>
         <Descriptions column={1} bordered size="small">
-          <Descriptions.Item label="Tên đăng nhập">
-            {currentUser?.username || '-'}
-          </Descriptions.Item>
           <Descriptions.Item label="Họ và tên">
             {currentUser?.fullName || '-'}
           </Descriptions.Item>
@@ -22,9 +19,6 @@ export default function ProfilePage() {
           </Descriptions.Item>
           <Descriptions.Item label="Số điện thoại">
             {currentUser?.phoneNumber || '-'}
-          </Descriptions.Item>
-          <Descriptions.Item label="Vai trò">
-            {currentUser?.role || '-'}
           </Descriptions.Item>
         </Descriptions>
       </Card>
