@@ -1,7 +1,9 @@
 package com.tqp.cms.controller;
 
+import com.tqp.cms.dto.request.PatientSelfUpdateRequest;
 import com.tqp.cms.dto.request.PatientRegistrationRequest;
 import com.tqp.cms.dto.response.ApiResponse;
+import com.tqp.cms.dto.response.PatientSelfProfileResponse;
 import com.tqp.cms.dto.response.PatientRegistrationResponse;
 import com.tqp.cms.service.PatientService;
 import jakarta.validation.Valid;
@@ -10,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,5 +38,15 @@ public class PatientController {
                         .result(result)
                         .build()
         );
+    }
+
+    @PatchMapping("/me/profile")
+    @PreAuthorize("hasRole('PATIENT')")
+    public ApiResponse<PatientSelfProfileResponse> updateMyProfile(@RequestBody @Valid PatientSelfUpdateRequest request) {
+        return ApiResponse.<PatientSelfProfileResponse>builder()
+                .code(HttpStatus.OK.value())
+                .message("Patient profile updated successfully")
+                .result(patientService.updateMyProfile(request))
+                .build();
     }
 }

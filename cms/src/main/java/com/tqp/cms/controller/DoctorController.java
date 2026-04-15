@@ -1,6 +1,7 @@
 package com.tqp.cms.controller;
 
 import com.tqp.cms.dto.request.DoctorCreationRequest;
+import com.tqp.cms.dto.request.DoctorSelfUpdateRequest;
 import com.tqp.cms.dto.request.DoctorUpdateRequest;
 import com.tqp.cms.dto.response.ApiResponse;
 import com.tqp.cms.dto.response.DoctorDetailResponse;
@@ -30,11 +31,11 @@ import java.util.UUID;
 @RequestMapping("/doctors")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@PreAuthorize("hasRole('ADMIN')")
 public class DoctorController {
     DoctorService doctorService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<DoctorDetailResponse>> createDoctor(@RequestBody @Valid DoctorCreationRequest request) {
         DoctorDetailResponse result = doctorService.createDoctor(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -47,6 +48,7 @@ public class DoctorController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Page<DoctorResponse>>> getDoctors(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -63,6 +65,7 @@ public class DoctorController {
     }
 
     @GetMapping("/{doctorId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<DoctorDetailResponse>> getDoctorById(@PathVariable UUID doctorId) {
         return ResponseEntity.ok(
                 ApiResponse.<DoctorDetailResponse>builder()
@@ -74,6 +77,7 @@ public class DoctorController {
     }
 
     @PatchMapping("/{doctorId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<DoctorDetailResponse>> updateDoctor(
             @PathVariable UUID doctorId,
             @RequestBody @Valid DoctorUpdateRequest request
@@ -88,8 +92,19 @@ public class DoctorController {
     }
 
     @DeleteMapping("/{doctorId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> softDeleteDoctor(@PathVariable UUID doctorId) {
         doctorService.softDeleteDoctor(doctorId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/me/profile")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ApiResponse<DoctorDetailResponse> updateMyProfile(@RequestBody @Valid DoctorSelfUpdateRequest request) {
+        return ApiResponse.<DoctorDetailResponse>builder()
+                .code(HttpStatus.OK.value())
+                .message("Doctor profile updated successfully")
+                .result(doctorService.updateMyProfile(request))
+                .build();
     }
 }

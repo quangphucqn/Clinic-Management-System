@@ -21,6 +21,8 @@ public enum ErrorCode {
     USER_EXISTED(409, "User already exists", HttpStatus.CONFLICT),
     USER_NOT_FOUND(404, "User not found", HttpStatus.NOT_FOUND),
     EMAIL_EXISTED(409, "Email already exists", HttpStatus.CONFLICT),
+    CURRENT_PASSWORD_INCORRECT(400, "Current password is incorrect", HttpStatus.BAD_REQUEST),
+    NEW_PASSWORD_SAME_AS_OLD(400, "New password must be different from current password", HttpStatus.BAD_REQUEST),
     PATIENT_NOT_FOUND(404, "Patient not found", HttpStatus.NOT_FOUND),
     DOCTOR_NOT_FOUND(404, "Doctor not found", HttpStatus.NOT_FOUND),
     DOCTOR_EXISTED(409, "Doctor already exists", HttpStatus.CONFLICT),
