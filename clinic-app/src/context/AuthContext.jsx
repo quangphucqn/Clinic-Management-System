@@ -72,6 +72,14 @@ export function AuthProvider({ children }) {
     return profile
   }
 
+  async function refreshCurrentUser() {
+    const meResponse = await getCurrentUserProfile()
+    const profile = meResponse?.result || null
+    setCurrentUser(profile)
+    setCurrentUserProfile(profile)
+    return profile
+  }
+
   function logoutAndClear() {
     logout()
     setToken(null)
@@ -86,6 +94,7 @@ export function AuthProvider({ children }) {
       authLoading,
       isAuthenticated: Boolean(token),
       loginAndLoadProfile,
+      refreshCurrentUser,
       logoutAndClear,
     }),
     [authLoading, currentUser, token],

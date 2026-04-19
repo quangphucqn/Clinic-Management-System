@@ -1,5 +1,6 @@
 package com.tqp.cms.controller;
 
+import com.tqp.cms.dto.request.ChangePasswordRequest;
 import com.tqp.cms.dto.request.UserCreationRequest;
 import com.tqp.cms.dto.request.UserUpdateRequest;
 import com.tqp.cms.dto.response.ApiResponse;
@@ -31,12 +32,20 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
-    @PreAuthorize("isAuthenticated()")
     public ApiResponse<CurrentUserProfileResponse> getCurrentUserProfile() {
         return ApiResponse.<CurrentUserProfileResponse>builder()
                 .code(HttpStatus.OK.value())
                 .message("Get current user profile successfully")
                 .result(userService.getCurrentUserProfile())
+                .build();
+    }
+
+    @PatchMapping("/me/password")
+    public ApiResponse<Void> changeMyPassword(@RequestBody @Valid ChangePasswordRequest request) {
+        userService.changeMyPassword(request);
+        return ApiResponse.<Void>builder()
+                .code(HttpStatus.OK.value())
+                .message("Password changed successfully")
                 .build();
     }
 
