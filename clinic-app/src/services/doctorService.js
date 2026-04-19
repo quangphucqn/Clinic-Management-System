@@ -23,3 +23,8 @@ export async function updateDoctor(doctorId, payload) {
 export async function deleteDoctor(doctorId) {
   await api.delete(`/doctors/${doctorId}`)
 }
+
+export async function updateMyDoctorProfile(payload) {
+  const { data } = await api.patch('/doctors/me/profile', payload)
+  return data
+}
