@@ -16,8 +16,10 @@ import MedicineManagementPage from './pages/portal/admin/MedicineManagementPage.
 import DoctorManagementPage from './pages/portal/admin/DoctorManagementPage.jsx'
 import NotificationManagementPage from './pages/portal/admin/NotificationManagementPage.jsx'
 import SpecialtyManagementPage from './pages/portal/admin/SpecialtyManagementPage.jsx'
+import StatisticsPage from './pages/portal/admin/StatisticsPage.jsx'
 import TimeSlotManagementPage from './pages/portal/admin/TimeSlotManagementPage.jsx'
 import UnitManagementPage from './pages/portal/admin/UnitManagementPage.jsx'
+import ChangePasswordPage from './pages/portal/ChangePasswordPage.jsx'
 import DoctorExaminationPage from './pages/portal/doctor/DoctorExaminationPage.jsx'
 import DoctorPatientHistoryPage from './pages/portal/doctor/DoctorPatientHistoryPage.jsx'
 import DoctorSchedulePage from './pages/portal/doctor/DoctorSchedulePage.jsx'
@@ -54,6 +56,7 @@ export default function App() {
             >
               <Route index element={<RoleHomeRedirect />} />
               <Route path="profile" element={<ProfilePage />} />
+              <Route path="change-password" element={<ChangePasswordPage />} />
 
               <Route
                 path="patient/bookings/new"
@@ -114,6 +117,14 @@ export default function App() {
                 }
               />
 
+              <Route
+                path="admin/statistics"
+                element={
+                  <RequireRole roles={[ROLES.ADMIN]}>
+                    <StatisticsPage />
+                  </RequireRole>
+                }
+              />
               <Route
                 path="admin/timeslots"
                 element={
