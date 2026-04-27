@@ -1,5 +1,6 @@
 package com.tqp.cms.entity;
 
 public enum PaymentMethod {
-    BANK_TRANSFER
+    BANK_TRANSFER,
+    MOMO
 }

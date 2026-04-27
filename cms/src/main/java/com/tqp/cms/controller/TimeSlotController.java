@@ -30,10 +30,10 @@ import java.util.UUID;
 @RequestMapping("/time-slots")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@PreAuthorize("hasRole('ADMIN')")
 public class TimeSlotController {
     TimeSlotService timeSlotService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ApiResponse<TimeSlotResponse>> createTimeSlot(@RequestBody @Valid TimeSlotCreationRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -46,6 +46,7 @@ public class TimeSlotController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','PATIENT')")
     public ApiResponse<Page<TimeSlotResponse>> getTimeSlots(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -60,6 +61,7 @@ public class TimeSlotController {
 
 
     @PatchMapping("/{timeSlotId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<TimeSlotResponse> updateTimeSlot(
             @PathVariable UUID timeSlotId,
             @RequestBody @Valid TimeSlotUpdateRequest request
@@ -72,6 +74,7 @@ public class TimeSlotController {
     }
 
     @DeleteMapping("/{timeSlotId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> softDeleteTimeSlot(@PathVariable UUID timeSlotId) {
         timeSlotService.softDeleteTimeSlot(timeSlotId);
         return ResponseEntity.status(ErrorCode.DELETED.getHttpStatus()).body(

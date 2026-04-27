@@ -48,7 +48,7 @@ public class DoctorController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','PATIENT')")
     public ResponseEntity<ApiResponse<Page<DoctorResponse>>> getDoctors(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -65,7 +65,7 @@ public class DoctorController {
     }
 
     @GetMapping("/{doctorId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','PATIENT')")
     public ResponseEntity<ApiResponse<DoctorDetailResponse>> getDoctorById(@PathVariable UUID doctorId) {
         return ResponseEntity.ok(
                 ApiResponse.<DoctorDetailResponse>builder()
