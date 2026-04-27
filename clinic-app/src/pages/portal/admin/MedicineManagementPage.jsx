@@ -2,7 +2,6 @@ import {
   App,
   Button,
   Card,
-  Col,
   Descriptions,
   Drawer,
   Form,
@@ -12,6 +11,7 @@ import {
   Pagination,
   Popconfirm,
   Row,
+  Col,
   Select,
   Space,
   Spin,
@@ -60,6 +60,11 @@ export default function MedicineManagementPage() {
   const [pageSize, setPageSize] = useState(10)
   const [searchName, setSearchName] = useState('')
   const [debouncedName, setDebouncedName] = useState('')
+  const [filterCategory, setFilterCategory] = useState(undefined)
+  const [categoryOptions, setCategoryOptions] = useState([])
+  const [categoryLoading, setCategoryLoading] = useState(false)
+  const [categoryKeyword, setCategoryKeyword] = useState('')
+  const [debouncedCategoryKeyword, setDebouncedCategoryKeyword] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [editingMedicine, setEditingMedicine] = useState(null)
   const [selectedMedicine, setSelectedMedicine] = useState(null)
@@ -75,6 +80,7 @@ export default function MedicineManagementPage() {
     nextPage = page,
     nextPageSize = pageSize,
     name = debouncedName,
+    category = filterCategory,
   } = {}) {
     setLoading(true)
     try {
@@ -82,6 +88,7 @@ export default function MedicineManagementPage() {
         page: nextPage - 1,
         size: nextPageSize,
         name: name || undefined,
+        category: category || undefined,
       })
       const pageData = response?.result
       setMedicines(pageData?.content || [])
@@ -104,9 +111,48 @@ export default function MedicineManagementPage() {
 
   useEffect(() => {
     setPage(1)
-    loadMedicines({ nextPage: 1, nextPageSize: pageSize, name: debouncedName })
+    loadMedicines({
+      nextPage: 1,
+      nextPageSize: pageSize,
+      name: debouncedName,
+      category: filterCategory,
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedName])
+  }, [debouncedName, filterCategory])
+
+  async function loadCategoryOptions(keyword = debouncedCategoryKeyword) {
+    setCategoryLoading(true)
+    try {
+      const response = await getUnits({
+        page: 0,
+        size: 30,
+        name: keyword || undefined,
+      })
+      const items = response?.result?.content || []
+      setCategoryOptions(
+        items.map((item) => ({
+          label: item.name,
+          value: item.name,
+        })),
+      )
+    } catch (error) {
+      message.error(getErrorMessage(error))
+    } finally {
+      setCategoryLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedCategoryKeyword(categoryKeyword.trim())
+    }, 500)
+    return () => window.clearTimeout(timer)
+  }, [categoryKeyword])
+
+  useEffect(() => {
+    loadCategoryOptions()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedCategoryKeyword])
 
   async function loadUnitOptions({
     nextPage = 1,
@@ -273,7 +319,7 @@ export default function MedicineManagementPage() {
     try {
       await deleteMedicine(medicineId)
       message.success('Xóa thuốc thành công')
-      await loadMedicines({ name: debouncedName })
+      await loadMedicines({ name: debouncedName, category: filterCategory })
       if (selectedMedicine?.id === medicineId) {
         setSelectedMedicine(null)
       }
@@ -306,6 +352,18 @@ export default function MedicineManagementPage() {
               allowClear
               style={{ width: 240 }}
             />
+            <Select
+              allowClear
+              showSearch
+              filterOption={false}
+              placeholder="Lọc theo danh mục"
+              value={filterCategory}
+              options={categoryOptions}
+              loading={categoryLoading}
+              onSearch={setCategoryKeyword}
+              onChange={setFilterCategory}
+              style={{ width: 260 }}
+            />
             <Button type="primary" onClick={openCreateModal}>
               Thêm thuốc mới
             </Button>
@@ -318,74 +376,73 @@ export default function MedicineManagementPage() {
           </Card>
         ) : null}
 
-        <Row gutter={[16, 16]}>
+        <div className="medicine-grid__list">
           {medicines.map((medicine) => (
-            <Col xs={24} sm={12} lg={8} xl={6} key={medicine.id}>
-              <Card
-                hoverable
-                className="medicine-grid__card"
-                loading={loading}
-                cover={
-                  <div className="medicine-grid__cover">
-                    {medicine.imageUrl ? (
-                      <img src={medicine.imageUrl} alt={medicine.name} />
-                    ) : (
-                      <span className="medicine-grid__cover-fallback">
-                        Không có ảnh
-                      </span>
-                    )}
-                  </div>
-                }
-                onClick={() => setSelectedMedicine(medicine)}
-              >
-                <div className="medicine-grid__meta">
-                  <Title level={5} style={{ margin: 0 }}>
-                    {medicine.name}
-                  </Title>
-                  <Text type="secondary">{medicine.code}</Text>
-                  <Paragraph
-                    className="medicine-grid__unit"
-                    ellipsis={{ rows: 3, tooltip: medicine.unitName }}
-                  >
-                    {medicine.unitName}
-                  </Paragraph>
-                  <Text strong>{formatCurrency(medicine.price)}</Text>
+            <Card
+              key={medicine.id}
+              hoverable
+              className="medicine-grid__card"
+              loading={loading}
+              cover={
+                <div className="medicine-grid__cover">
+                  {medicine.imageUrl ? (
+                    <img src={medicine.imageUrl} alt={medicine.name} />
+                  ) : (
+                    <span className="medicine-grid__cover-fallback">
+                      Không có ảnh
+                    </span>
+                  )}
                 </div>
+              }
+              onClick={() => setSelectedMedicine(medicine)}
+            >
+              <div className="medicine-grid__meta">
+                <Title level={5} style={{ margin: 0 }}>
+                  {medicine.name}
+                </Title>
+                <Text type="secondary">{medicine.code}</Text>
+                <Paragraph
+                  className="medicine-grid__unit"
+                  ellipsis={{ rows: 3, tooltip: medicine.unitName }}
+                >
+                  {medicine.unitName}
+                </Paragraph>
+                <Text strong>{formatCurrency(medicine.price)}</Text>
+              </div>
 
-                <div className="medicine-grid__actions">
+              <div className="medicine-grid__actions">
+                <Button
+                  type="link"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    openEditModal(medicine)
+                  }}
+                >
+                  Cập nhật thuốc
+                </Button>
+                <Popconfirm
+                  title="Xóa thuốc"
+                  description="Bạn chắc chắn muốn xóa thuốc này?"
+                  okText="Xóa"
+                  cancelText="Hủy"
+                  onConfirm={(e) => {
+                    e?.stopPropagation()
+                    return handleDelete(medicine.id)
+                  }}
+                >
                   <Button
                     type="link"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      openEditModal(medicine)
-                    }}
+                    danger
+                    loading={deletingId === medicine.id}
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    Cập nhật thuốc
+                    Xóa
                   </Button>
-                  <Popconfirm
-                    title="Xóa thuốc"
-                    description="Bạn chắc chắn muốn xóa thuốc này?"
-                    okText="Xóa"
-                    cancelText="Hủy"
-                    onConfirm={(e) => {
-                      e?.stopPropagation()
-                      return handleDelete(medicine.id)
-                    }}
-                  >
-                    <Button
-                      type="link"
-                      danger
-                      loading={deletingId === medicine.id}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      Xóa
-                    </Button>
-                  </Popconfirm>
-                </div>
-              </Card>
-            </Col>
+                </Popconfirm>
+              </div>
+            </Card>
           ))}
-        </Row>
+        </div>
 
         <div className="medicine-grid__pagination">
           <Pagination

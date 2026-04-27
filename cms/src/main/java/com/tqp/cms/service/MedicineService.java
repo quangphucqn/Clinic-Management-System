@@ -15,7 +15,7 @@ public interface MedicineService {
 
     MedicineResponse getMedicineById(UUID medicineId);
 
-    Page<MedicineResponse> getMedicines(int page, int size, String name);
+    Page<MedicineResponse> getMedicines(int page, int size, String name, String category);
 
     MedicineResponse updateMedicine(UUID medicineId, MedicineUpdateRequest request);
 

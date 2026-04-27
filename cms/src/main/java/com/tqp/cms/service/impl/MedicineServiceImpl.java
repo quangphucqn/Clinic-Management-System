@@ -65,11 +65,17 @@ public class MedicineServiceImpl implements MedicineService {
     }
 
     @Override
-    public Page<MedicineResponse> getMedicines(int page, int size, String name) {
+    public Page<MedicineResponse> getMedicines(int page, int size, String name, String category) {
         Pageable pageable = PageRequest.of(page, size,Sort.by(Sort.Direction.DESC, "updatedAt"));
         Page<com.tqp.cms.entity.Medicine> medicines;
-        if (name != null && !name.isBlank()) {
+        boolean hasName = name != null && !name.isBlank();
+        boolean hasCategory = category != null && !category.isBlank();
+        if (hasName && hasCategory) {
+            medicines = medicineRepository.findByNameAndCategory(name, category, pageable);
+        } else if (hasName) {
             medicines = medicineRepository.findByActiveTrueAndNameContainingIgnoreCase(name, pageable);
+        } else if (hasCategory) {
+            medicines = medicineRepository.findByActiveTrueAndUnit_NameContainingIgnoreCase(category, pageable);
         } else {
             medicines = medicineRepository.findByActiveTrue(pageable);
         }
