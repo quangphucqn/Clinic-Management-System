@@ -45,6 +45,11 @@
   background: #f5f7fb;
 }
 
+.portal-layout__menu .ant-menu-item .ant-menu-title-content {
+  font-size: 15px;
+  font-weight: 600;
+}
+
 .portal-layout__profile-link.ant-btn {
   padding-inline: 0;
   color: #111 !important;

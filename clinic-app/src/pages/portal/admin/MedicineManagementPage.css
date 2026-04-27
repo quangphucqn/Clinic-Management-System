@@ -2,12 +2,11 @@
   width: 100%;
 }
 
-.medicine-grid .ant-row {
+.medicine-grid__list {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
   align-items: stretch;
-}
-
-.medicine-grid .ant-col {
-  display: flex;
 }
 
 .medicine-grid__cover {
@@ -75,5 +74,29 @@
   display: flex;
   justify-content: center;
   margin-top: 8px;
+}
+
+@media (max-width: 1200px) {
+  .medicine-grid__list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 992px) {
+  .medicine-grid__list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .medicine-grid__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .medicine-grid__list {
+    grid-template-columns: 1fr;
+  }
 }
 

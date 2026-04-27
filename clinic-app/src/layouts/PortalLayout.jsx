@@ -84,11 +84,10 @@ function getMenuItemsByRole(role) {
 
   if (role === ROLES.ADMIN) {
     return [
-      { key: ROUTES.adminStatistics, icon: <BarChartOutlined />, label: 'Thống kê' },
+      { key: ROUTES.adminNotifications, icon: <BellOutlined />, label: 'Quản lý thông báo' },
       { key: ROUTES.adminTimeslots, icon: <ClockCircleOutlined />, label: 'Quản lý giờ khám' },
       { key: ROUTES.adminSpecialties, icon: <ClusterOutlined />, label: 'Quản lý chuyên khoa' },
       { key: ROUTES.adminDoctors, icon: <TeamOutlined />, label: 'Quản lý bác sĩ' },
-      { key: ROUTES.adminNotifications, icon: <BellOutlined />, label: 'Quản lý thông báo' },
       {
         key: ROUTES.adminUnits,
         icon: <AppstoreOutlined />,
@@ -99,6 +98,7 @@ function getMenuItemsByRole(role) {
         icon: <MedicineBoxOutlined />,
         label: 'Quản lý thuốc',
       },
+      { key: ROUTES.adminStatistics, icon: <BarChartOutlined />, label: 'Thống kê' },
     ]
   }
 
@@ -261,6 +261,7 @@ export default function PortalLayout() {
           <span className="portal-layout__brand-text">CMS</span>
         </div>
         <Menu
+          className="portal-layout__menu"
           mode="inline"
           selectedKeys={selectedKey ? [selectedKey] : []}
           items={items}
