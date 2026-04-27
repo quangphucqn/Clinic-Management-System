@@ -68,11 +68,6 @@ function getMenuItemsByRole(role) {
         label: 'Xem lịch sử khám bệnh',
       },
       {
-        key: ROUTES.patientPrescriptions,
-        icon: <FileTextOutlined />,
-        label: 'Xem đơn thuốc',
-      },
-      {
         key: ROUTES.patientLabResults,
         icon: <FileSearchOutlined />,
         label: 'Xem kết quả xét nghiệm',

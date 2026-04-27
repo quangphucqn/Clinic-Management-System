@@ -24,9 +24,14 @@ cloudinary:
   api-secret: ${CLOUDINARY_API_SECRET}
 
 sendgrid:
-  enabled: ${SENDGRID_ENABLED}
-  api-key: ${SENDGRID_API_KEY}
-  from-email: ${SENDGRID_FROM_EMAIL}
+  enabled: ${SENDGRID_ENABLED:false}
+  api-key: ${SENDGRID_API_KEY:}
+  from-email: ${SENDGRID_FROM_EMAIL:}
+  from-name: ${SENDGRID_FROM_NAME:Clinic Management System}
+  logo-url: https://res.cloudinary.com/dkhl4h3nz/image/upload/v1777220016/icons8-clinic-96_1_ecv8ax.png
+  theme-color: #78cfdd
+  support-email: support@clinic.local
+  support-hotline: 0000000000
 
 momo:
   enabled: ${MOMO_ENABLED:false}

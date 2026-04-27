@@ -30,6 +30,13 @@ function getPaymentMethodLabel(method) {
   return method || '-'
 }
 
+function isPastAppointmentDate(appointmentDate) {
+  if (!appointmentDate) return false
+  const appointmentDay = dayjs(appointmentDate)
+  if (!appointmentDay.isValid()) return false
+  return appointmentDay.isBefore(dayjs(), 'day')
+}
+
 function renderAppointmentStatus(status) {
   if (status === 'CONFIRMED') return <Tag color="success">Đã xác nhận</Tag>
   if (status === 'PENDING') return <Tag color="warning">Chờ xác nhận</Tag>
@@ -62,6 +69,11 @@ export default function PatientDepositPage() {
   }, [loadAppointments])
 
   const handleRetryPayment = useCallback(async (record) => {
+    if (isPastAppointmentDate(record?.appointmentDate)) {
+      message.warning('Lịch khám đã qua ngày hiện tại, không thể thanh toán đặt cọc.')
+      return
+    }
+
     try {
       setRetryingKey(record.appointmentId)
       const response = await retryAppointmentPayment(record.appointmentId, PAYMENT_METHODS.MOMO)
@@ -132,7 +144,10 @@ export default function PatientDepositPage() {
         width: 170,
         fixed: 'right',
         render: (_, record) => {
-          const canRetry = record.status !== 'CANCELLED' && record.paymentStatus !== 'SUCCESS'
+          const isPastDate = isPastAppointmentDate(record.appointmentDate)
+          const canRetry =
+            record.status !== 'CANCELLED' && record.paymentStatus !== 'SUCCESS' && !isPastDate
+          if (isPastDate) return <Tag>Quá ngày khám</Tag>
           if (!canRetry) return '-'
           return (
             <Button
@@ -200,7 +215,8 @@ export default function PatientDepositPage() {
         onClose={() => setSelectedAppointment(null)}
         extra={
           selectedAppointment?.status !== 'CANCELLED' &&
-          selectedAppointment?.paymentStatus !== 'SUCCESS' ? (
+          selectedAppointment?.paymentStatus !== 'SUCCESS' &&
+          !isPastAppointmentDate(selectedAppointment?.appointmentDate) ? (
             <Button
               type="primary"
               loading={retryingKey === selectedAppointment?.appointmentId}

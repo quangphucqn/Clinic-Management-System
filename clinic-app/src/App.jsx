@@ -25,7 +25,6 @@ import PatientDepositPage from './pages/portal/patient/PatientDepositPage.jsx'
 import PatientHistoryPage from './pages/portal/patient/PatientHistoryPage.jsx'
 import PatientLabResultsPage from './pages/portal/patient/PatientLabResultsPage.jsx'
 import PatientReviewPage from './pages/portal/patient/PatientReviewPage.jsx'
-import PatientPrescriptionPage from './pages/portal/patient/PatientPrescriptionPage.jsx'
 import ChangePasswordPage from './pages/portal/ChangePasswordPage.jsx'
 import DoctorSchedulePage from './pages/portal/doctor/DoctorSchedulePage.jsx'
 import DoctorExaminationPage from './pages/portal/doctor/DoctorExaminationPage.jsx'
@@ -97,14 +96,6 @@ export default function App() {
                 element={
                   <RequireRole roles={[ROLES.PATIENT]}>
                     <PatientDepositPage />
-                  </RequireRole>
-                }
-              />
-              <Route
-                path="patient/prescriptions"
-                element={
-                  <RequireRole roles={[ROLES.PATIENT]}>
-                    <PatientPrescriptionPage />
                   </RequireRole>
                 }
               />
