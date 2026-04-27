@@ -1,5 +1,6 @@
 package com.tqp.cms.service.impl;
 
+import com.tqp.cms.dto.request.ChangePasswordRequest;
 import com.tqp.cms.dto.request.UserCreationRequest;
 import com.tqp.cms.dto.request.UserUpdateRequest;
 import com.tqp.cms.dto.response.CurrentUserProfileResponse;
@@ -116,6 +117,24 @@ public class UserServiceImpl implements UserService {
                 .doctorProfile(doctorProfile)
                 .patientProfile(patientProfile)
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void changeMyPassword(ChangePasswordRequest request) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        var user = usersRepository.findByUsernameAndActiveTrue(username)
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new AppException(ErrorCode.CURRENT_PASSWORD_INCORRECT);
+        }
+        if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
+            throw new AppException(ErrorCode.NEW_PASSWORD_SAME_AS_OLD);
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        usersRepository.save(user);
     }
 
     @Override

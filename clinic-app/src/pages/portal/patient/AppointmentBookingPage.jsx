@@ -5,13 +5,11 @@ import {
   UserOutlined,
 } from '@ant-design/icons'
 import {
-  Alert,
   App,
   Button,
   Card,
   Col,
   DatePicker,
-  Descriptions,
   Form,
   Input,
   Row,
@@ -21,7 +19,11 @@ import {
 } from 'antd'
 import dayjs from 'dayjs'
 import { useEffect, useMemo, useState } from 'react'
-import { bookAppointment } from '../../../services/appointmentPatientService.js'
+import {
+  bookAppointment,
+  getBookedTimeSlotIds,
+} from '../../../services/appointmentPatientService.js'
+import { getAppointmentDepositConfig } from '../../../services/appointmentDepositConfigService.js'
 import { getDoctors } from '../../../services/doctorService.js'
 import { getSpecialties } from '../../../services/specialtyService.js'
 import { getTimeSlots } from '../../../services/timeSlotService.js'
@@ -29,6 +31,9 @@ import { getErrorMessage } from '../../../utils/httpError.js'
 
 const { Title, Paragraph, Text } = Typography
 const { TextArea } = Input
+const PAYMENT_METHODS = {
+  MOMO: 'MOMO',
+}
 
 function toTimeLabel(slot) {
   if (!slot?.startTime || !slot?.endTime) return slot?.slotCode || 'Khung giờ'
@@ -43,7 +48,8 @@ export default function AppointmentBookingPage() {
   const [specialties, setSpecialties] = useState([])
   const [doctors, setDoctors] = useState([])
   const [timeSlots, setTimeSlots] = useState([])
-  const [bookingResult, setBookingResult] = useState(null)
+  const [bookedSlotIds, setBookedSlotIds] = useState([])
+  const [depositAmount, setDepositAmount] = useState(0)
 
   useEffect(() => {
     let active = true
@@ -51,10 +57,11 @@ export default function AppointmentBookingPage() {
     async function loadOptions() {
       setLoadingOptions(true)
       try {
-        const [specialtyResponse, doctorResponse, slotResponse] = await Promise.all([
+        const [specialtyResponse, doctorResponse, slotResponse, depositConfigResponse] = await Promise.all([
           getSpecialties({ page: 0, size: 200 }),
           getDoctors({ page: 0, size: 200 }),
           getTimeSlots({ page: 0, size: 200 }),
+          getAppointmentDepositConfig(),
         ])
 
         if (!active) return
@@ -62,6 +69,7 @@ export default function AppointmentBookingPage() {
         setSpecialties(specialtyResponse?.result?.content || [])
         setDoctors(doctorResponse?.result?.content || [])
         setTimeSlots(slotResponse?.result?.content || [])
+        setDepositAmount(Number(depositConfigResponse?.result?.amount || 0))
       } catch (error) {
         if (!active) return
         message.error(getErrorMessage(error))
@@ -80,6 +88,7 @@ export default function AppointmentBookingPage() {
   const selectedSpecialtyId = Form.useWatch('specialtyId', form)
   const selectedDoctorId = Form.useWatch('doctorId', form)
   const selectedDate = Form.useWatch('appointmentDate', form)
+  const selectedTimeSlotId = Form.useWatch('timeSlotId', form)
 
   const specialtyOptions = useMemo(() => {
     return specialties
@@ -90,7 +99,9 @@ export default function AppointmentBookingPage() {
 
   const doctorOptions = useMemo(() => {
     const filtered = selectedSpecialtyId
-      ? doctors.filter((doctor) => doctor.specialtyId === selectedSpecialtyId)
+      ? doctors.filter(
+          (doctor) => doctor.specialtyId === selectedSpecialtyId || doctor.specialty?.id === selectedSpecialtyId,
+        )
       : []
 
     return filtered.map((doctor) => ({
@@ -99,21 +110,59 @@ export default function AppointmentBookingPage() {
     }))
   }, [doctors, selectedSpecialtyId])
 
+  const bookedSlotIdSet = useMemo(() => new Set(bookedSlotIds), [bookedSlotIds])
+
   const slotOptions = useMemo(() => {
     if (!selectedDoctorId || !selectedDate) return []
     return timeSlots
       .filter((slot) => slot.enabled !== false)
-      .map((slot) => ({ value: slot.id, label: toTimeLabel(slot) }))
-  }, [selectedDate, selectedDoctorId, timeSlots])
+      .map((slot) => {
+        const isBooked = bookedSlotIdSet.has(slot.id)
+        return {
+          value: slot.id,
+          label: isBooked ? `${toTimeLabel(slot)} - đã có lịch` : toTimeLabel(slot),
+          disabled: isBooked,
+        }
+      })
+  }, [bookedSlotIdSet, selectedDate, selectedDoctorId, timeSlots])
 
   const selectedDoctorLabel = useMemo(
-    () => doctorOptions.find((item) => item.value === form.getFieldValue('doctorId'))?.label,
-    [doctorOptions, form],
+    () => doctorOptions.find((item) => item.value === selectedDoctorId)?.label,
+    [doctorOptions, selectedDoctorId],
   )
   const selectedSlotLabel = useMemo(
-    () => slotOptions.find((item) => item.value === form.getFieldValue('timeSlotId'))?.label,
-    [form, slotOptions],
+    () => slotOptions.find((item) => item.value === selectedTimeSlotId)?.label,
+    [selectedTimeSlotId, slotOptions],
   )
+
+  useEffect(() => {
+    let active = true
+
+    async function loadBookedSlots() {
+      if (!selectedDoctorId || !selectedDate) {
+        setBookedSlotIds([])
+        return
+      }
+
+      try {
+        const response = await getBookedTimeSlotIds({
+          doctorId: selectedDoctorId,
+          appointmentDate: selectedDate.format('YYYY-MM-DD'),
+        })
+        if (!active) return
+        setBookedSlotIds(response?.result || [])
+      } catch {
+        if (!active) return
+        setBookedSlotIds([])
+      }
+    }
+
+    loadBookedSlots()
+
+    return () => {
+      active = false
+    }
+  }, [selectedDate, selectedDoctorId])
 
   function handleValuesChange(changedValues) {
     if ('specialtyId' in changedValues) {
@@ -135,12 +184,25 @@ export default function AppointmentBookingPage() {
         appointmentDate: values.appointmentDate.format('YYYY-MM-DD'),
         reason: values.reason.trim(),
         note: values.note?.trim() || undefined,
+        paymentMethod: values.paymentMethod,
       }
 
       const response = await bookAppointment(payload)
-      setBookingResult(response?.result || null)
-      message.success('Đặt lịch khám thành công')
-      form.resetFields(['reason', 'note'])
+      const result = response?.result || null
+
+      if (result?.paymentStatus === 'SUCCESS') {
+        message.success('Đặt lịch và thanh toán thành công')
+      } else if (result?.paymentStatus === 'PENDING') {
+        message.info('Đã tạo lịch hẹn và khởi tạo thanh toán. Vui lòng hoàn tất để xác nhận lịch.')
+      } else {
+        message.warning('Đã tạo lịch hẹn nhưng khởi tạo thanh toán chưa thành công. Vui lòng thử lại.')
+      }
+
+      if (result?.paymentMethod === PAYMENT_METHODS.MOMO && result?.paymentUrl) {
+        window.open(result.paymentUrl, '_blank', 'noopener,noreferrer')
+      }
+
+      form.resetFields(['reason', 'note', 'paymentMethod'])
     } catch (error) {
       if (error?.errorFields) return
       message.error(getErrorMessage(error))
@@ -165,7 +227,12 @@ export default function AppointmentBookingPage() {
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={16}>
           <Card loading={loadingOptions}>
-            <Form form={form} layout="vertical" onValuesChange={handleValuesChange}>
+            <Form
+              form={form}
+              layout="vertical"
+              onValuesChange={handleValuesChange}
+              initialValues={{ paymentMethod: PAYMENT_METHODS.MOMO }}
+            >
               <Form.Item
                 label="Khoa"
                 name="specialtyId"
@@ -244,6 +311,25 @@ export default function AppointmentBookingPage() {
                 <TextArea rows={3} placeholder="Thông tin bổ sung (không bắt buộc)" />
               </Form.Item>
 
+              <Form.Item label="Số tiền đặt cọc (VND)">
+                <Input
+                  value={new Intl.NumberFormat('vi-VN').format(depositAmount || 0)}
+                  suffix="VND"
+                  disabled
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Phương thức thanh toán"
+                name="paymentMethod"
+                rules={[{ required: true, message: 'Vui lòng chọn phương thức thanh toán' }]}
+              >
+                <Select
+                  options={[{ value: PAYMENT_METHODS.MOMO, label: 'MoMo (thanh toán online)' }]}
+                  disabled
+                />
+              </Form.Item>
+
               <Space>
                 <Button type="primary" loading={submitting} onClick={handleSubmit}>
                   Xác nhận đặt lịch
@@ -259,8 +345,7 @@ export default function AppointmentBookingPage() {
             <Space direction="vertical" size={8}>
               <Text>
                 <ClusterOutlined /> Khoa:{' '}
-                {specialtyOptions.find((item) => item.value === form.getFieldValue('specialtyId'))
-                  ?.label || '-'}
+                {specialtyOptions.find((item) => item.value === selectedSpecialtyId)?.label || '-'}
               </Text>
               <Text>
                 <UserOutlined /> Bác sĩ:{' '}
@@ -276,37 +361,12 @@ export default function AppointmentBookingPage() {
                   ? form.getFieldValue('appointmentDate').format('DD/MM/YYYY')
                   : '-'}
               </Text>
+              <Text>
+                Tiền đặt cọc:{' '}
+                {`${new Intl.NumberFormat('vi-VN').format(depositAmount || 0)} VND`}
+              </Text>
             </Space>
           </Card>
-
-          {bookingResult ? (
-            <Card style={{ marginTop: 16 }}>
-              <Alert
-                message="Đặt lịch thành công"
-                description="Bạn có thể theo dõi trạng thái lịch hẹn trong mục Lịch khám."
-                type="success"
-                showIcon
-                style={{ marginBottom: 16 }}
-              />
-              <Descriptions bordered size="small" column={1}>
-                <Descriptions.Item label="Mã lịch hẹn">
-                  {bookingResult.appointmentId}
-                </Descriptions.Item>
-                <Descriptions.Item label="Doctor ID">{bookingResult.doctorId}</Descriptions.Item>
-                <Descriptions.Item label="Time Slot ID">
-                  {bookingResult.timeSlotId}
-                </Descriptions.Item>
-                <Descriptions.Item label="Ngày khám">
-                  {bookingResult.appointmentDate
-                    ? dayjs(bookingResult.appointmentDate).format('DD/MM/YYYY')
-                    : '-'}
-                </Descriptions.Item>
-                <Descriptions.Item label="Trạng thái">
-                  {bookingResult.status || 'PENDING'}
-                </Descriptions.Item>
-              </Descriptions>
-            </Card>
-          ) : null}
         </Col>
       </Row>
     </Space>

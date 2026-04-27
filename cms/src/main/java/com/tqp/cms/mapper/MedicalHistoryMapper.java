@@ -12,8 +12,16 @@ public class MedicalHistoryMapper {
 
         return MedicalHistoryResponse.builder()
                 .medicalRecordId(record.getId())
+                .appointmentDate(record.getAppointment().getAppointmentDate())
+                .timeSlot(
+                        record.getAppointment().getTimeSlotConfig().getStartTime()
+                                + " - "
+                                + record.getAppointment().getTimeSlotConfig().getEndTime()
+                )
                 .visitedAt(record.getVisitedAt())
+                .symptoms(record.getSymptoms())
                 .diagnosis(record.getDiagnosis())
+                .conclusion(record.getConclusion())
                 .doctorName(record.getDoctor().getUserAccount().getFullName())
                 .prescriptionId(
                         record.getPrescription() != null

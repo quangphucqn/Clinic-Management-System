@@ -29,5 +29,4 @@ public class AppointmentDoctorDetailsResponse {
     String reason;
     String note;
     LocalDateTime createdAt;
-
 }

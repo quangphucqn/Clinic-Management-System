@@ -12,6 +12,8 @@ public interface SpecialtyService {
 
     Page<SpecialtyResponse> getSpecialties(int page, int size, String name);
 
+    SpecialtyResponse getSpecialtyById(UUID specialtyId);
+
     SpecialtyResponse updateSpecialty(UUID specialtyId, SpecialtyUpdateRequest request);
 
     void softDeleteSpecialty(UUID specialtyId);

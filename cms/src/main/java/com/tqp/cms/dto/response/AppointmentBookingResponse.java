@@ -1,6 +1,8 @@
 package com.tqp.cms.dto.response;
 
 import com.tqp.cms.entity.AppointmentStatus;
+import com.tqp.cms.entity.PaymentMethod;
+import com.tqp.cms.entity.PaymentStatus;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -26,4 +28,9 @@ public class AppointmentBookingResponse {
     BigDecimal depositAmount;
     String reason;
     String note;
+    UUID paymentTransactionId;
+    PaymentMethod paymentMethod;
+    PaymentStatus paymentStatus;
+    String transactionCode;
+    String paymentUrl;
 }

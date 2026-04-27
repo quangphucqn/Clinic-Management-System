@@ -1,6 +1,7 @@
 package com.tqp.cms.service.impl;
 
 import com.tqp.cms.dto.request.DoctorCreationRequest;
+import com.tqp.cms.dto.request.DoctorSelfUpdateRequest;
 import com.tqp.cms.dto.request.DoctorUpdateRequest;
 import com.tqp.cms.dto.response.DoctorDetailResponse;
 import com.tqp.cms.dto.response.DoctorResponse;
@@ -23,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -129,6 +131,40 @@ public class DoctorServiceImpl implements DoctorService {
             doctor.setBiography(request.getBiography());
         }
 
+        return doctorMapper.toDetailResponse(doctorRepository.save(doctor));
+    }
+
+    @Override
+    @Transactional
+    public DoctorDetailResponse updateMyProfile(DoctorSelfUpdateRequest request) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        var user = usersRepository.findByUsernameAndActiveTrue(username)
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+
+        var doctor = doctorRepository.findByUserAccountId(user.getId())
+                .filter(item -> item.isActive())
+                .orElseThrow(() -> new AppException(ErrorCode.DOCTOR_NOT_FOUND));
+
+        if (request.getEmail() != null) {
+            if (usersRepository.existsByEmailAndIdNot(request.getEmail(), user.getId())) {
+                throw new AppException(ErrorCode.EMAIL_EXISTED);
+            }
+            user.setEmail(request.getEmail());
+        }
+        if (request.getPhoneNumber() != null) {
+            user.setPhoneNumber(request.getPhoneNumber());
+        }
+        if (request.getLicenseNumber() != null) {
+            if (doctorRepository.existsByLicenseNumberAndIdNot(request.getLicenseNumber(), doctor.getId())) {
+                throw new AppException(ErrorCode.DOCTOR_EXISTED);
+            }
+            doctor.setLicenseNumber(request.getLicenseNumber());
+        }
+        if (request.getBiography() != null) {
+            doctor.setBiography(request.getBiography());
+        }
+
+        usersRepository.save(user);
         return doctorMapper.toDetailResponse(doctorRepository.save(doctor));
     }
 

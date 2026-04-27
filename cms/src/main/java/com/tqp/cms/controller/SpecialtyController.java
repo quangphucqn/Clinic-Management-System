@@ -29,11 +29,11 @@ import java.util.UUID;
 @RequestMapping("/specialties")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@PreAuthorize("hasRole('ADMIN')")
 public class SpecialtyController {
     SpecialtyService specialtyService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<SpecialtyResponse>> createSpecialty(
             @RequestBody @Valid SpecialtyCreationRequest request
     ) {
@@ -47,6 +47,7 @@ public class SpecialtyController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','PATIENT')")
     public ApiResponse<Page<SpecialtyResponse>> getSpecialties(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -60,6 +61,7 @@ public class SpecialtyController {
     }
 
     @GetMapping("/{specialtyId}")
+    @PreAuthorize("hasAnyRole('ADMIN','PATIENT')")
     public ApiResponse<SpecialtyResponse> getSpecialtyById(@PathVariable UUID specialtyId) {
         return ApiResponse.<SpecialtyResponse>builder()
                 .code(HttpStatus.OK.value())
@@ -69,6 +71,7 @@ public class SpecialtyController {
     }
 
     @PatchMapping("/{specialtyId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<SpecialtyResponse> updateSpecialty(
             @PathVariable UUID specialtyId,
             @RequestBody @Valid SpecialtyUpdateRequest request
@@ -81,6 +84,7 @@ public class SpecialtyController {
     }
 
     @DeleteMapping("/{specialtyId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> softDeleteSpecialty(@PathVariable UUID specialtyId) {
         specialtyService.softDeleteSpecialty(specialtyId);
         return ResponseEntity.status(HttpStatus.OK).body(
