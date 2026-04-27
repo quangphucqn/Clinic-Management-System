@@ -1,6 +1,7 @@
 package com.tqp.cms.controller;
 
 import com.tqp.cms.dto.request.DoctorCreationRequest;
+import com.tqp.cms.dto.request.DoctorSelfUpdateRequest;
 import com.tqp.cms.dto.request.DoctorUpdateRequest;
 import com.tqp.cms.dto.response.ApiResponse;
 import com.tqp.cms.dto.response.DoctorDetailResponse;
@@ -95,5 +96,15 @@ public class DoctorController {
     public ResponseEntity<Void> softDeleteDoctor(@PathVariable UUID doctorId) {
         doctorService.softDeleteDoctor(doctorId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/me/profile")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ApiResponse<DoctorDetailResponse> updateMyProfile(@RequestBody @Valid DoctorSelfUpdateRequest request) {
+        return ApiResponse.<DoctorDetailResponse>builder()
+                .code(HttpStatus.OK.value())
+                .message("Doctor profile updated successfully")
+                .result(doctorService.updateMyProfile(request))
+                .build();
     }
 }

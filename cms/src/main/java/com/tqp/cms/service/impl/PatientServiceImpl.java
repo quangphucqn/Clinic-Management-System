@@ -1,5 +1,7 @@
 package com.tqp.cms.service.impl;
 
+import com.tqp.cms.dto.request.PatientSelfUpdateRequest;
+import com.tqp.cms.dto.response.PatientSelfProfileResponse;
 import com.tqp.cms.dto.request.PatientRegistrationRequest;
 import com.tqp.cms.dto.response.PatientRegistrationResponse;
 import com.tqp.cms.entity.Patient;
@@ -14,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,6 +65,60 @@ public class PatientServiceImpl implements PatientService {
                 .fullName(savedUser.getFullName())
                 .email(savedUser.getEmail())
                 .role(savedUser.getRole())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public PatientSelfProfileResponse updateMyProfile(PatientSelfUpdateRequest request) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        var user = usersRepository.findByUsernameAndActiveTrue(username)
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+
+        var patient = patientRepository.findByUserAccountId(user.getId())
+                .filter(item -> item.isActive())
+                .orElseThrow(() -> new AppException(ErrorCode.PATIENT_NOT_FOUND));
+
+        if (request.getEmail() != null) {
+            if (usersRepository.existsByEmailAndIdNot(request.getEmail(), user.getId())) {
+                throw new AppException(ErrorCode.EMAIL_EXISTED);
+            }
+            user.setEmail(request.getEmail());
+        }
+        if (request.getPhoneNumber() != null) {
+            user.setPhoneNumber(request.getPhoneNumber());
+        }
+        if (request.getGender() != null) {
+            patient.setGender(request.getGender());
+        }
+        if (request.getDateOfBirth() != null) {
+            patient.setDateOfBirth(request.getDateOfBirth());
+        }
+        if (request.getAddress() != null) {
+            patient.setAddress(request.getAddress());
+        }
+        if (request.getEmergencyContactName() != null) {
+            patient.setEmergencyContactName(request.getEmergencyContactName());
+        }
+        if (request.getEmergencyContactPhone() != null) {
+            patient.setEmergencyContactPhone(request.getEmergencyContactPhone());
+        }
+
+        usersRepository.save(user);
+        patient = patientRepository.save(patient);
+
+        return PatientSelfProfileResponse.builder()
+                .userId(user.getId())
+                .patientId(patient.getId())
+                .username(user.getUsername())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .gender(patient.getGender())
+                .dateOfBirth(patient.getDateOfBirth())
+                .address(patient.getAddress())
+                .emergencyContactName(patient.getEmergencyContactName())
+                .emergencyContactPhone(patient.getEmergencyContactPhone())
                 .build();
     }
 }

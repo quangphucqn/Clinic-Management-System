@@ -14,12 +14,22 @@ import LoginPage from './pages/auth/LoginPage.jsx'
 import RegisterPage from './pages/auth/RegisterPage.jsx'
 import MedicineManagementPage from './pages/portal/admin/MedicineManagementPage.jsx'
 import DoctorManagementPage from './pages/portal/admin/DoctorManagementPage.jsx'
-import NotificationManagementPage from './pages/portal/admin/NotificationManagementPage.jsx'
 import SpecialtyManagementPage from './pages/portal/admin/SpecialtyManagementPage.jsx'
 import TimeSlotManagementPage from './pages/portal/admin/TimeSlotManagementPage.jsx'
 import UnitManagementPage from './pages/portal/admin/UnitManagementPage.jsx'
+import StatisticsPage from './pages/portal/admin/StatisticsPage.jsx'
+import NotificationManagementPage from './pages/portal/admin/NotificationManagementPage.jsx'
+import AppointmentDepositConfigPage from './pages/portal/admin/AppointmentDepositConfigPage.jsx'
 import AppointmentBookingPage from './pages/portal/patient/AppointmentBookingPage.jsx'
+import PatientDepositPage from './pages/portal/patient/PatientDepositPage.jsx'
+import PatientHistoryPage from './pages/portal/patient/PatientHistoryPage.jsx'
+import PatientLabResultsPage from './pages/portal/patient/PatientLabResultsPage.jsx'
+import PatientReviewPage from './pages/portal/patient/PatientReviewPage.jsx'
 import PatientPrescriptionPage from './pages/portal/patient/PatientPrescriptionPage.jsx'
+import ChangePasswordPage from './pages/portal/ChangePasswordPage.jsx'
+import DoctorSchedulePage from './pages/portal/doctor/DoctorSchedulePage.jsx'
+import DoctorExaminationPage from './pages/portal/doctor/DoctorExaminationPage.jsx'
+import DoctorPatientHistoryPage from './pages/portal/doctor/DoctorPatientHistoryPage.jsx'
 import FeaturePage from './pages/portal/FeaturePage.jsx'
 import ProfilePage from './pages/portal/ProfilePage.jsx'
 
@@ -53,6 +63,7 @@ export default function App() {
             >
               <Route index element={<RoleHomeRedirect />} />
               <Route path="profile" element={<ProfilePage />} />
+              <Route path="change-password" element={<ChangePasswordPage />} />
 
               <Route
                 path="patient/bookings/new"
@@ -77,7 +88,39 @@ export default function App() {
                 path="patient/history"
                 element={
                   <RequireRole roles={[ROLES.PATIENT]}>
+                    <PatientHistoryPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="patient/deposit"
+                element={
+                  <RequireRole roles={[ROLES.PATIENT]}>
+                    <PatientDepositPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="patient/prescriptions"
+                element={
+                  <RequireRole roles={[ROLES.PATIENT]}>
                     <PatientPrescriptionPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="patient/lab-results"
+                element={
+                  <RequireRole roles={[ROLES.PATIENT]}>
+                    <PatientLabResultsPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="patient/reviews"
+                element={
+                  <RequireRole roles={[ROLES.PATIENT]}>
+                    <PatientReviewPage />
                   </RequireRole>
                 }
               />
@@ -86,14 +129,43 @@ export default function App() {
                 path="doctor/schedule"
                 element={
                   <RequireRole roles={[ROLES.DOCTOR]}>
-                    <FeaturePage
-                      title="Lịch khám bác sĩ"
-                      description="Bác sĩ theo dõi các lịch hẹn bệnh nhân theo từng ngày."
-                    />
+                    <DoctorSchedulePage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="doctor/schedule/:appointmentId/examination"
+                element={
+                  <RequireRole roles={[ROLES.DOCTOR]}>
+                    <DoctorExaminationPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="doctor/patient-history"
+                element={
+                  <RequireRole roles={[ROLES.DOCTOR]}>
+                    <DoctorPatientHistoryPage />
                   </RequireRole>
                 }
               />
 
+              <Route
+                path="admin/statistics"
+                element={
+                  <RequireRole roles={[ROLES.ADMIN]}>
+                    <StatisticsPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="admin/deposit-config"
+                element={
+                  <RequireRole roles={[ROLES.ADMIN]}>
+                    <AppointmentDepositConfigPage />
+                  </RequireRole>
+                }
+              />
               <Route
                 path="admin/timeslots"
                 element={

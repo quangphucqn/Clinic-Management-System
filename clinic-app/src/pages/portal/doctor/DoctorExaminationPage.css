@@ -1,0 +1,125 @@
+.doctor-examination {
+  width: 100%;
+}
+
+.doctor-examination__stack {
+  width: 100%;
+}
+
+.doctor-examination__hero {
+  overflow: hidden;
+  border: 1px solid #d7eef3;
+  background:
+    radial-gradient(circle at top right, rgba(108, 197, 216, 0.2), transparent 32%),
+    linear-gradient(180deg, #fcffff 0%, #f2fafc 100%);
+  box-shadow: 0 20px 40px rgba(108, 197, 216, 0.12);
+}
+
+.doctor-examination__hero-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+}
+
+.doctor-examination__hero-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.doctor-examination__hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.doctor-examination__summary-grid {
+  margin-top: 4px;
+}
+
+.doctor-examination__progress-card,
+.doctor-examination__section,
+.doctor-examination__lab-item,
+.doctor-examination__summary-card {
+  border-color: #e2f1f5;
+  border-radius: 18px;
+}
+
+.doctor-examination__progress-card {
+  position: sticky;
+  top: 24px;
+}
+
+.doctor-examination__progress-list {
+  display: grid;
+  gap: 12px;
+}
+
+.doctor-examination__progress-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fbfeff 0%, #f6fbfd 100%);
+}
+
+.doctor-examination__progress-item strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.doctor-examination__section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.doctor-examination__section-note {
+  max-width: 280px;
+  text-align: right;
+}
+
+.doctor-examination__medication-row {
+  padding: 16px;
+  border: 1px dashed #cfe6eb;
+  border-radius: 16px;
+  background: #fbfeff;
+}
+
+.doctor-examination__lab-item {
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbfd 100%);
+}
+
+.doctor-examination__lab-item + .doctor-examination__lab-item {
+  margin-top: 12px;
+}
+
+.doctor-examination__result-block {
+  padding: 14px;
+  border-radius: 14px;
+  background: #f5fbf7;
+  border: 1px solid #dcefe2;
+}
+
+@media (max-width: 991px) {
+  .doctor-examination__progress-card {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .doctor-examination__hero-row,
+  .doctor-examination__section-header {
+    flex-direction: column;
+  }
+
+  .doctor-examination__section-note {
+    max-width: none;
+    text-align: left;
+  }
+}

@@ -50,6 +50,14 @@ public class SpecialtyServiceImpl implements SpecialtyService {
     }
 
     @Override
+    public SpecialtyResponse getSpecialtyById(UUID specialtyId) {
+        var specialty = specialtyRepository.findById(specialtyId)
+                .filter(item -> item.isActive())
+                .orElseThrow(() -> new AppException(ErrorCode.SPECIALTY_NOT_FOUND));
+        return specialtyMapper.toResponse(specialty);
+    }
+
+    @Override
     @Transactional
     public SpecialtyResponse updateSpecialty(UUID specialtyId, SpecialtyUpdateRequest request) {
         var specialty = specialtyRepository.findById(specialtyId)

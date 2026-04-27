@@ -1,6 +1,7 @@
 package com.tqp.cms.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.tqp.cms.entity.PaymentMethod;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -34,4 +35,9 @@ public class AppointmentBookingRequest {
     String reason;
 
     String note;
+
+    @NotNull(message = "FIELD_REQUIRED")
+    PaymentMethod paymentMethod;
+
+    String transactionCode;
 }

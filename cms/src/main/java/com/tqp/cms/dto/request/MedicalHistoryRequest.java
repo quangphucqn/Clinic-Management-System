@@ -10,5 +10,5 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MedicalHistoryRequest {
     int page = 0;
-    int size = 1;
+    int size = 10;
 }

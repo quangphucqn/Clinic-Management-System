@@ -1,16 +1,21 @@
 import {
-  BellFilled,
   AppstoreOutlined,
+  BarChartOutlined,
+  BellFilled,
   BellOutlined,
   CalendarOutlined,
+  FileSearchOutlined,
   ClusterOutlined,
   ClockCircleOutlined,
+  DownOutlined,
   FileTextOutlined,
   MedicineBoxOutlined,
+  MoneyCollectOutlined,
+  StarOutlined,
   TeamOutlined,
 } from '@ant-design/icons'
 import { Client } from '@stomp/stompjs'
-import { App, Button, Layout, Menu, Modal, Space, Table, Typography } from 'antd'
+import { App, Button, Dropdown, Layout, Menu, Modal, Space, Table, Typography } from 'antd'
 import { useEffect, useRef, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { API_BASE_URL } from '../config/env.js'
@@ -50,17 +55,32 @@ function getMenuItemsByRole(role) {
       {
         key: ROUTES.patientBook,
         icon: <CalendarOutlined />,
-        label: 'Đặt khám',
+        label: 'Đặt lịch khám online',
       },
       {
-        key: ROUTES.patientAppointments,
-        icon: <ClockCircleOutlined />,
-        label: 'Lịch khám',
+        key: ROUTES.patientDeposit,
+        icon: <MoneyCollectOutlined />,
+        label: 'Thanh toán đặt cọc',
       },
       {
         key: ROUTES.patientHistory,
         icon: <FileTextOutlined />,
-        label: 'Lịch sử khám',
+        label: 'Xem lịch sử khám bệnh',
+      },
+      {
+        key: ROUTES.patientPrescriptions,
+        icon: <FileTextOutlined />,
+        label: 'Xem đơn thuốc',
+      },
+      {
+        key: ROUTES.patientLabResults,
+        icon: <FileSearchOutlined />,
+        label: 'Xem kết quả xét nghiệm',
+      },
+      {
+        key: ROUTES.patientReviews,
+        icon: <StarOutlined />,
+        label: 'Đánh giá bác sĩ',
       },
     ]
   }
@@ -70,13 +90,20 @@ function getMenuItemsByRole(role) {
       {
         key: ROUTES.doctorSchedule,
         icon: <CalendarOutlined />,
-        label: 'Lịch khám bác sĩ',
+        label: 'Lịch khám và khám bệnh',
+      },
+      {
+        key: ROUTES.doctorPatientHistory,
+        icon: <FileTextOutlined />,
+        label: 'Lịch sử khám bệnh nhân',
       },
     ]
   }
 
   if (role === ROLES.ADMIN) {
     return [
+      { key: ROUTES.adminStatistics, icon: <BarChartOutlined />, label: 'Thống kê' },
+      { key: ROUTES.adminDepositConfig, icon: <MoneyCollectOutlined />, label: 'Tiền đặt cọc khám' },
       { key: ROUTES.adminTimeslots, icon: <ClockCircleOutlined />, label: 'Quản lý giờ khám' },
       { key: ROUTES.adminSpecialties, icon: <ClusterOutlined />, label: 'Quản lý chuyên khoa' },
       { key: ROUTES.adminDoctors, icon: <TeamOutlined />, label: 'Quản lý bác sĩ' },
@@ -224,6 +251,20 @@ export default function PortalLayout() {
 
   const namePrefix = role === ROLES.DOCTOR ? 'Bác sĩ ' : ''
   const displayName = currentUser?.fullName || currentUser?.username || ''
+  const profileMenuItems = [
+    { key: 'profile', label: 'Quản lý tài khoản' },
+    { key: 'change-password', label: 'Đổi mật khẩu' },
+  ]
+
+  function handleProfileMenuClick({ key }) {
+    if (key === 'profile') {
+      navigate(ROUTES.profile)
+      return
+    }
+    if (key === 'change-password') {
+      navigate(ROUTES.changePassword)
+    }
+  }
 
   return (
     <Layout className="portal-layout">
@@ -259,13 +300,17 @@ export default function PortalLayout() {
               onClick={openNotificationModal}
             />
             <Text type="secondary">Xin chào,</Text>
-            <Button
-              type="link"
-              className="portal-layout__profile-link"
-              onClick={() => navigate(ROUTES.profile)}
+            <Dropdown
+              trigger={['hover']}
+              menu={{ items: profileMenuItems, onClick: handleProfileMenuClick }}
             >
-              {`${namePrefix}${displayName}`}
-            </Button>
+              <Button type="link" className="portal-layout__profile-link">
+                <Space size={6}>
+                  {`${namePrefix}${displayName}`}
+                  <DownOutlined style={{ fontSize: 12 }} />
+                </Space>
+              </Button>
+            </Dropdown>
             <Button onClick={handleLogout}>Đăng xuất</Button>
           </Space>
         </Header>
