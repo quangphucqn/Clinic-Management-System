@@ -9,7 +9,6 @@ export const ROUTES = {
   patientAppointments: '/app/patient/appointments',
   patientHistory: '/app/patient/history',
   patientDeposit: '/app/patient/deposit',
-  patientPrescriptions: '/app/patient/prescriptions',
   patientLabResults: '/app/patient/lab-results',
   patientReviews: '/app/patient/reviews',
   doctorSchedule: '/app/doctor/schedule',

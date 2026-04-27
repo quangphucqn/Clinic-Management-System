@@ -265,6 +265,9 @@ public class AppointmentPatientServiceImpl implements AppointmentPatientService 
         if (!appointment.getPatient().getId().equals(patient.getId())) {
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
+        if (appointment.getAppointmentDate().isBefore(LocalDate.now())) {
+            throw new AppException(ErrorCode.PAYMENT_EXPIRED);
+        }
 
         var latestTransaction = paymentTransactionRepository
                 .findTopByAppointment_IdAndActiveTrueOrderByPaidAtDesc(appointmentId)

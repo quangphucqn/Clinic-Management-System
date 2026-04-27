@@ -4,7 +4,6 @@ import com.tqp.cms.exception.AppException;
 import com.tqp.cms.exception.ErrorCode;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
@@ -13,7 +12,6 @@ import org.springframework.web.client.RestClient;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class SendGridEmailService {
     private final RestClient restClient = RestClient.builder()
             .baseUrl("https://api.sendgrid.com")
@@ -27,6 +25,21 @@ public class SendGridEmailService {
 
     @Value("${sendgrid.from-email:}")
     private String fromEmail;
+
+    @Value("${sendgrid.from-name:Clinic Management System}")
+    private String fromName;
+
+    @Value("${sendgrid.logo-url:https://res.cloudinary.com/dkhl4h3nz/image/upload/v1777220016/icons8-clinic-96_1_ecv8ax.png}")
+    private String logoUrl;
+
+    @Value("${sendgrid.theme-color:#1f87e6}")
+    private String themeColor;
+
+    @Value("${sendgrid.support-email:support@clinic.local}")
+    private String supportEmail;
+
+    @Value("${sendgrid.support-hotline:0000000000}")
+    private String supportHotline;
 
     public void send(String subject, String content, List<String> toEmails) {
         if (toEmails == null || toEmails.isEmpty()) {
@@ -44,9 +57,12 @@ public class SendGridEmailService {
 
         Map<String, Object> body = Map.of(
                 "personalizations", personalizations,
-                "from", Map.of("email", fromEmail),
+                "from", Map.of("email", fromEmail, "name", fromName),
                 "subject", subject,
-                "content", List.of(Map.of("type", "text/plain", "value", content))
+                "content", List.of(
+                        Map.of("type", "text/plain", "value", content),
+                        Map.of("type", "text/html", "value", buildHtmlEmail(subject, content))
+                )
         );
 
         try {
@@ -65,5 +81,86 @@ public class SendGridEmailService {
             log.error("SendGrid email send failed", exception);
             throw new AppException(ErrorCode.EMAIL_SEND_FAILED);
         }
+    }
+
+    private String buildHtmlEmail(String subject, String content) {
+        String safeSubject = escapeHtml(subject);
+        String safeContent = escapeHtml(content).replace("\n", "<br/>");
+        String safeFromName = escapeHtml(fromName);
+        String safeSupportEmail = escapeHtml(supportEmail);
+        String safeSupportHotline = escapeHtml(supportHotline);
+        String sentAt = java.time.LocalDateTime.now().toString().replace("T", " ");
+
+        return """
+                <!doctype html>
+                <html lang="en">
+                <head>
+                  <meta charset="UTF-8" />
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                  <title>%s</title>
+                </head>
+                <body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,sans-serif;color:#1f2937;">
+                  <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:24px 0;">
+                    <tr>
+                      <td align="center">
+                        <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="max-width:640px;background:#ffffff;border-radius:10px;overflow:hidden;">
+                          <tr>
+                            <td align="center" style="background:%s;padding:26px 20px;">
+                              <img src="%s" alt="logo" style="max-width:180px;height:auto;display:block;" />
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding:28px 36px;">
+                              <p style="margin:0 0 10px 0;font-size:14px;color:#6b7280;">Thong bao tu he thong</p>
+                              <h2 style="margin:0 0 16px 0;font-size:28px;line-height:1.3;color:#111827;">%s</h2>
+                              <p style="margin:0;font-size:17px;line-height:1.8;color:#1f2937;">%s</p>
+                              <p style="margin:16px 0 0 0;font-size:13px;color:#6b7280;">Thoi gian gui: %s</p>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding:0 36px 28px 36px;">
+                              <hr style="border:none;border-top:1px solid #e5e7eb;margin:0 0 20px 0;" />
+                              <p style="margin:0 0 8px 0;font-size:14px;color:#4b5563;">Need support? Contact us:</p>
+                              <p style="margin:0;font-size:14px;color:#111827;">
+                                Hotline: <strong>%s</strong><br/>
+                                Email: <a href="mailto:%s" style="color:%s;text-decoration:none;">%s</a>
+                              </p>
+                              <p style="margin:22px 0 0 0;font-size:14px;color:#6b7280;">
+                                Best regards,<br/>
+                                <strong>%s</strong>
+                              </p>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+                </body>
+                </html>
+                """.formatted(
+                safeSubject,
+                themeColor,
+                logoUrl,
+                safeSubject,
+                safeContent,
+                sentAt,
+                safeSupportHotline,
+                safeSupportEmail,
+                themeColor,
+                safeSupportEmail,
+                safeFromName
+        );
+    }
+
+    private String escapeHtml(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
     }
 }

@@ -51,6 +51,7 @@ public enum ErrorCode {
     PAYMENT_NOT_FOUND(404, "Payment transaction not found", HttpStatus.NOT_FOUND),
     PAYMENT_FAILED(400, "Payment failed", HttpStatus.BAD_REQUEST),
     PAYMENT_METHOD_NOT_SUPPORTED(400, "Only MoMo payment is supported for appointment booking", HttpStatus.BAD_REQUEST),
+    PAYMENT_EXPIRED(400, "Cannot process payment because appointment date has passed", HttpStatus.BAD_REQUEST),
     REVIEW_NOT_FOUND(404, "Doctor review not found", HttpStatus.NOT_FOUND),
     REVIEW_EXISTED(409, "Doctor review already exists", HttpStatus.CONFLICT),
     NOTIFICATION_NOT_FOUND(404, "Notification not found", HttpStatus.NOT_FOUND),
