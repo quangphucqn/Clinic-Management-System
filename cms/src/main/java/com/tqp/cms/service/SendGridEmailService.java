@@ -13,6 +13,11 @@ import org.springframework.web.client.RestClient;
 @Slf4j
 @Service
 public class SendGridEmailService {
+    private static final String DEFAULT_LOGO_URL = "https://res.cloudinary.com/dkhl4h3nz/image/upload/v1777220016/icons8-clinic-96_1_ecv8ax.png";
+    private static final String DEFAULT_THEME_COLOR = "#72d6e2";
+    private static final String DEFAULT_SUPPORT_EMAIL = "support@clinic.local";
+    private static final String DEFAULT_SUPPORT_HOTLINE = "0825499079";
+
     private final RestClient restClient = RestClient.builder()
             .baseUrl("https://api.sendgrid.com")
             .build();
@@ -28,18 +33,6 @@ public class SendGridEmailService {
 
     @Value("${sendgrid.from-name:Clinic Management System}")
     private String fromName;
-
-    @Value("${sendgrid.logo-url:https://res.cloudinary.com/dkhl4h3nz/image/upload/v1777220016/icons8-clinic-96_1_ecv8ax.png}")
-    private String logoUrl;
-
-    @Value("${sendgrid.theme-color:#1f87e6}")
-    private String themeColor;
-
-    @Value("${sendgrid.support-email:support@clinic.local}")
-    private String supportEmail;
-
-    @Value("${sendgrid.support-hotline:0000000000}")
-    private String supportHotline;
 
     public void send(String subject, String content, List<String> toEmails) {
         if (toEmails == null || toEmails.isEmpty()) {
@@ -87,8 +80,8 @@ public class SendGridEmailService {
         String safeSubject = escapeHtml(subject);
         String safeContent = escapeHtml(content).replace("\n", "<br/>");
         String safeFromName = escapeHtml(fromName);
-        String safeSupportEmail = escapeHtml(supportEmail);
-        String safeSupportHotline = escapeHtml(supportHotline);
+        String safeSupportEmail = escapeHtml(DEFAULT_SUPPORT_EMAIL);
+        String safeSupportHotline = escapeHtml(DEFAULT_SUPPORT_HOTLINE);
         String sentAt = java.time.LocalDateTime.now().toString().replace("T", " ");
 
         return """
@@ -106,7 +99,8 @@ public class SendGridEmailService {
                         <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="max-width:640px;background:#ffffff;border-radius:10px;overflow:hidden;">
                           <tr>
                             <td align="center" style="background:%s;padding:26px 20px;">
-                              <img src="%s" alt="logo" style="max-width:180px;height:auto;display:block;" />
+                              <img src="%s" alt="logo" style="max-width:180px;height:auto;display:block;margin:0 auto;" />
+                              <p style="margin:10px 0 0 0;color:#ffffff;font-size:16px;font-weight:600;">%s</p>
                             </td>
                           </tr>
                           <tr>
@@ -139,14 +133,15 @@ public class SendGridEmailService {
                 </html>
                 """.formatted(
                 safeSubject,
-                themeColor,
-                logoUrl,
+                DEFAULT_THEME_COLOR,
+                DEFAULT_LOGO_URL,
+                safeFromName,
                 safeSubject,
                 safeContent,
                 sentAt,
                 safeSupportHotline,
                 safeSupportEmail,
-                themeColor,
+                DEFAULT_THEME_COLOR,
                 safeSupportEmail,
                 safeFromName
         );

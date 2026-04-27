@@ -69,12 +69,13 @@ public class MedicineController {
     public ApiResponse<Page<MedicineResponse>> getMedicines(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String name
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String category
     ) {
         return ApiResponse.<Page<MedicineResponse>>builder()
                 .code(HttpStatus.OK.value())
                 .message("Get medicines successfully")
-                .result(medicineService.getMedicines(page, size, name))
+                .result(medicineService.getMedicines(page, size, name, category))
                 .build();
     }
 
