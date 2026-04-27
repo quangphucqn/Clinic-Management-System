@@ -28,3 +28,14 @@ sendgrid:
   api-key: ${SENDGRID_API_KEY:}
   from-email: ${SENDGRID_FROM_EMAIL:}
   from-name: ${SENDGRID_FROM_NAME:Clinic Management System}
+
+momo:
+  enabled: ${MOMO_ENABLED:false}
+  endpoint: ${MOMO_ENDPOINT:https://test-payment.momo.vn/v2/gateway/api/create}
+  partner-code: ${MOMO_PARTNER_CODE:}
+  access-key: ${MOMO_ACCESS_KEY:}
+  secret-key: ${MOMO_SECRET_KEY:}
+  redirect-url: ${MOMO_REDIRECT_URL:http://localhost:5173/payment-result}
+  ipn-url: ${MOMO_IPN_URL:http://localhost:8080/api/payments/momo/ipn}
+  request-type: ${MOMO_REQUEST_TYPE:captureWallet}
+  lang: ${MOMO_LANG:vi}

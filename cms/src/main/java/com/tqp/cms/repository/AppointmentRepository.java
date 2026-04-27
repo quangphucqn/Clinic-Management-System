@@ -24,6 +24,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
             Pageable pageable
     );
 
+    List<Appointment> findByDoctorIdAndAppointmentDateAndActiveTrue(
+            UUID doctorId,
+            LocalDate appointmentDate
+    );
+
     Page<Appointment> findByDoctorIdAndStatus(
             UUID doctorId,
             AppointmentStatus status,
@@ -40,6 +45,27 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
     Page<Appointment> findByDoctorIdAndPatient_UserAccount_FullNameContainingIgnoreCase(
             UUID doctorId,
             String fullName,
+            Pageable pageable
+    );
+
+    boolean existsByDoctorIdAndAppointmentDateAndTimeSlotConfigIdAndActiveTrue(
+            UUID doctorId,
+            LocalDate appointmentDate,
+            UUID timeSlotConfigId
+    );
+
+    boolean existsByPatientIdAndDoctorIdAndAppointmentDateAndTimeSlotConfigIdAndActiveTrue(
+            UUID patientId,
+            UUID doctorId,
+            LocalDate appointmentDate,
+            UUID timeSlotConfigId
+    );
+
+    Page<Appointment> findByPatientIdAndActiveTrue(UUID patientId, Pageable pageable);
+
+    Page<Appointment> findByPatientIdAndStatusAndActiveTrue(
+            UUID patientId,
+            AppointmentStatus status,
             Pageable pageable
     );
 

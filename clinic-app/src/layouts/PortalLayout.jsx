@@ -2,13 +2,17 @@ import {
   BellFilled,
   AppstoreOutlined,
   BarChartOutlined,
+  BellFilled,
   BellOutlined,
   CalendarOutlined,
+  FileSearchOutlined,
   ClusterOutlined,
   ClockCircleOutlined,
   DownOutlined,
   FileTextOutlined,
   MedicineBoxOutlined,
+  MoneyCollectOutlined,
+  StarOutlined,
   TeamOutlined,
 } from '@ant-design/icons'
 import { Client } from '@stomp/stompjs'
@@ -52,17 +56,27 @@ function getMenuItemsByRole(role) {
       {
         key: ROUTES.patientBook,
         icon: <CalendarOutlined />,
-        label: 'Đặt khám',
+        label: 'Đặt lịch khám online',
       },
       {
-        key: ROUTES.patientAppointments,
-        icon: <ClockCircleOutlined />,
-        label: 'Lịch khám',
+        key: ROUTES.patientDeposit,
+        icon: <MoneyCollectOutlined />,
+        label: 'Thanh toán đặt cọc',
       },
       {
         key: ROUTES.patientHistory,
         icon: <FileTextOutlined />,
-        label: 'Lịch sử khám',
+        label: 'Xem lịch sử khám bệnh',
+      },
+      {
+        key: ROUTES.patientLabResults,
+        icon: <FileSearchOutlined />,
+        label: 'Xem kết quả xét nghiệm',
+      },
+      {
+        key: ROUTES.patientReviews,
+        icon: <StarOutlined />,
+        label: 'Đánh giá bác sĩ',
       },
     ]
   }
@@ -84,6 +98,8 @@ function getMenuItemsByRole(role) {
 
   if (role === ROLES.ADMIN) {
     return [
+      { key: ROUTES.adminStatistics, icon: <BarChartOutlined />, label: 'Thống kê' },
+      { key: ROUTES.adminDepositConfig, icon: <MoneyCollectOutlined />, label: 'Tiền đặt cọc khám' },
       { key: ROUTES.adminNotifications, icon: <BellOutlined />, label: 'Quản lý thông báo' },
       { key: ROUTES.adminTimeslots, icon: <ClockCircleOutlined />, label: 'Quản lý giờ khám' },
       { key: ROUTES.adminSpecialties, icon: <ClusterOutlined />, label: 'Quản lý chuyên khoa' },
@@ -261,7 +277,6 @@ export default function PortalLayout() {
           <span className="portal-layout__brand-text">CMS</span>
         </div>
         <Menu
-          className="portal-layout__menu"
           mode="inline"
           selectedKeys={selectedKey ? [selectedKey] : []}
           items={items}
