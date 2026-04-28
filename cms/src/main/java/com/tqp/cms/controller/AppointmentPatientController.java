@@ -5,6 +5,7 @@ import com.tqp.cms.dto.request.DoctorReviewCreationRequest;
 import com.tqp.cms.dto.response.ApiResponse;
 import com.tqp.cms.dto.response.AppointmentBookingResponse;
 import com.tqp.cms.dto.response.AppointmentHistoryResponse;
+import com.tqp.cms.dto.response.AppointmentSlotAvailabilityResponse;
 import com.tqp.cms.dto.response.DoctorReviewResponse;
 import com.tqp.cms.dto.response.MedicalHistoryResponse;
 import com.tqp.cms.dto.response.PatientLabResultResponse;
@@ -97,11 +98,11 @@ public class AppointmentPatientController {
     }
 
     @GetMapping("/appointments/booked-slots")
-    public ApiResponse<List<UUID>> getBookedSlotsByDoctorAndDate(
+    public ApiResponse<List<AppointmentSlotAvailabilityResponse>> getBookedSlotsByDoctorAndDate(
             @RequestParam UUID doctorId,
             @RequestParam LocalDate appointmentDate
     ) {
-        return ApiResponse.<List<UUID>>builder()
+        return ApiResponse.<List<AppointmentSlotAvailabilityResponse>>builder()
                 .code(HttpStatus.OK.value())
                 .message("Get booked slots successfully")
                 .result(appointmentPatientService.getBookedTimeSlotIds(doctorId, appointmentDate))
