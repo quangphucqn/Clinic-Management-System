@@ -48,7 +48,12 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
     @Override
     public Page<TimeSlotResponse> getTimeSlots(int page, int size, String slotCode) {
-        Pageable pageable = PageRequest.of(page, size,Sort.by(Sort.Direction.DESC, "updatedAt"));
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.ASC, "startTime")
+                        .and(Sort.by(Sort.Direction.ASC, "endTime"))
+        );
         Page<com.tqp.cms.entity.TimeSlotConfig> slotPage;
         if (slotCode != null && !slotCode.isBlank()) {
             slotPage = timeSlotConfigRepository.findByActiveTrueAndSlotCodeContainingIgnoreCase(slotCode, pageable);

@@ -1,4 +1,4 @@
-import { FileTextOutlined, ReloadOutlined } from '@ant-design/icons'
+import { FileTextOutlined } from '@ant-design/icons'
 import {
   App,
   Button,
@@ -136,9 +136,6 @@ export default function PatientLabResultsPage() {
               Theo dõi kết quả xét nghiệm của bạn. Nhấn vào từng dòng để xem chi tiết.
             </Paragraph>
           </div>
-          <Button icon={<ReloadOutlined />} onClick={loadResults}>
-            Tải lại
-          </Button>
         </Space>
       </Card>
 

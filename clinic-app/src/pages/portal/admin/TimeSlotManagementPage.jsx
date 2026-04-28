@@ -230,7 +230,7 @@ export default function TimeSlotManagementPage() {
           </Title>
           <Space wrap>
             <Input
-              placeholder="Tìm theo mã slot (VD: 1300)"
+              placeholder="Tìm theo mã giờ khám"
               value={searchSlotCode}
               onChange={(e) => setSearchSlotCode(e.target.value)}
               allowClear
