@@ -1,5 +1,4 @@
 import { App, Button, Card, Descriptions, Drawer, Empty, Space, Table, Tag, Typography } from 'antd'
-import { ReloadOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
@@ -184,9 +183,6 @@ export default function PatientDepositPage() {
               Danh sách lịch khám gọn theo trạng thái thanh toán. Nhấn vào mỗi dòng để xem chi tiết.
             </Paragraph>
           </div>
-          <Button icon={<ReloadOutlined />} onClick={loadAppointments}>
-            Tải lại
-          </Button>
         </Space>
       </Card>
 
