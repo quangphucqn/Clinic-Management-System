@@ -6,6 +6,11 @@ import {
   getPatientStatisticsByQuarter,
   getPatientStatisticsByYear,
 } from '../../../services/patientStatisticsService.js'
+import {
+  getRevenueStatisticsByMonth,
+  getRevenueStatisticsByQuarter,
+  getRevenueStatisticsByYear,
+} from '../../../services/revenueStatisticsService.js'
 import { getErrorMessage } from '../../../utils/httpError.js'
 
 const { Title, Text } = Typography
@@ -25,22 +30,52 @@ function formatPeriod(record, mode) {
 export default function StatisticsPage() {
   const { message } = App.useApp()
   const [loading, setLoading] = useState(false)
-  const [viewMode, setViewMode] = useState(VIEW_MODE.MONTHLY)
+  const [patientViewMode, setPatientViewMode] = useState(VIEW_MODE.MONTHLY)
+  const [revenueViewMode, setRevenueViewMode] = useState(VIEW_MODE.MONTHLY)
   const [monthlyStats, setMonthlyStats] = useState([])
   const [quarterlyStats, setQuarterlyStats] = useState([])
   const [yearlyStats, setYearlyStats] = useState([])
+  const [monthlyRevenueStats, setMonthlyRevenueStats] = useState([])
+  const [quarterlyRevenueStats, setQuarterlyRevenueStats] = useState([])
+  const [yearlyRevenueStats, setYearlyRevenueStats] = useState([])
+
+  function toAmountNumber(value) {
+    const numberValue = Number(value)
+    return Number.isFinite(numberValue) ? numberValue : 0
+  }
+
+  function formatCurrency(value) {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+      maximumFractionDigits: 0,
+    }).format(toAmountNumber(value))
+  }
 
   async function loadStatistics() {
     setLoading(true)
     try {
-      const [monthlyRes, quarterlyRes, yearlyRes] = await Promise.all([
+      const [
+        monthlyRes,
+        quarterlyRes,
+        yearlyRes,
+        monthlyRevenueRes,
+        quarterlyRevenueRes,
+        yearlyRevenueRes,
+      ] = await Promise.all([
         getPatientStatisticsByMonth(),
         getPatientStatisticsByQuarter(),
         getPatientStatisticsByYear(),
+        getRevenueStatisticsByMonth(),
+        getRevenueStatisticsByQuarter(),
+        getRevenueStatisticsByYear(),
       ])
       setMonthlyStats(monthlyRes?.result || [])
       setQuarterlyStats(quarterlyRes?.result || [])
       setYearlyStats(yearlyRes?.result || [])
+      setMonthlyRevenueStats(monthlyRevenueRes?.result || [])
+      setQuarterlyRevenueStats(quarterlyRevenueRes?.result || [])
+      setYearlyRevenueStats(yearlyRevenueRes?.result || [])
     } catch (error) {
       message.error(getErrorMessage(error))
     } finally {
@@ -54,30 +89,54 @@ export default function StatisticsPage() {
   }, [])
 
   const currentStats = useMemo(() => {
-    if (viewMode === VIEW_MODE.QUARTERLY) return quarterlyStats
-    if (viewMode === VIEW_MODE.YEARLY) return yearlyStats
+    if (patientViewMode === VIEW_MODE.QUARTERLY) return quarterlyStats
+    if (patientViewMode === VIEW_MODE.YEARLY) return yearlyStats
     return monthlyStats
-  }, [monthlyStats, quarterlyStats, viewMode, yearlyStats])
+  }, [monthlyStats, patientViewMode, quarterlyStats, yearlyStats])
+
+  const currentRevenueStats = useMemo(() => {
+    if (revenueViewMode === VIEW_MODE.QUARTERLY) return quarterlyRevenueStats
+    if (revenueViewMode === VIEW_MODE.YEARLY) return yearlyRevenueStats
+    return monthlyRevenueStats
+  }, [monthlyRevenueStats, quarterlyRevenueStats, revenueViewMode, yearlyRevenueStats])
 
   const latestYearlyTotal = yearlyStats[0]?.totalPatients ?? 0
   const allPatientTotal = yearlyStats.reduce(
     (sum, item) => sum + (item.totalPatients || 0),
     0,
   )
-  const chartData = useMemo(
+  const latestRevenueAmount = yearlyRevenueStats[0]?.totalAmount ?? 0
+  const allRevenueAmount = yearlyRevenueStats.reduce(
+    (sum, item) => sum + toAmountNumber(item.totalAmount),
+    0,
+  )
+
+  const patientChartData = useMemo(
     () =>
       currentStats
         .slice()
         .reverse()
         .map((item) => ({
-          period: formatPeriod(item, viewMode),
+          period: formatPeriod(item, patientViewMode),
           totalPatients: item.totalPatients || 0,
         })),
-    [currentStats, viewMode],
+    [currentStats, patientViewMode],
   )
 
-  const chartConfig = {
-    data: chartData,
+  const revenueChartData = useMemo(
+    () =>
+      currentRevenueStats
+        .slice()
+        .reverse()
+        .map((item) => ({
+          period: formatPeriod(item, revenueViewMode),
+          totalAmount: toAmountNumber(item.totalAmount),
+        })),
+    [currentRevenueStats, revenueViewMode],
+  )
+
+  const patientChartConfig = {
+    data: patientChartData,
     xField: 'period',
     yField: 'totalPatients',
     color: '#6cc5d8',
@@ -99,7 +158,7 @@ export default function StatisticsPage() {
     },
     interaction: {
       tooltip: {
-        render: (event, { title, items }) => (
+        render: (_event, { title, items }) => (
           <div style={{ padding: 8 }}>
             <div style={{ marginBottom: 6, fontWeight: 600 }}>{title}</div>
             <div>{`Số bệnh nhân: ${items?.[0]?.value ?? 0}`}</div>
@@ -109,11 +168,39 @@ export default function StatisticsPage() {
     },
   }
 
-  const columns = [
+  const revenueChartConfig = {
+    data: revenueChartData,
+    xField: 'period',
+    yField: 'totalAmount',
+    color: '#73d13d',
+    autoFit: true,
+    height: 360,
+    label: {
+      position: 'top',
+      formatter: (datum) => `${Math.round(datum.totalAmount).toLocaleString('vi-VN')} đ`,
+      style: { fill: '#4a4a4a' },
+    },
+    axis: {
+      y: { title: 'Doanh thu (VND)' },
+      x: { title: 'Mốc thời gian' },
+    },
+    interaction: {
+      tooltip: {
+        render: (_event, { title, items }) => (
+          <div style={{ padding: 8 }}>
+            <div style={{ marginBottom: 6, fontWeight: 600 }}>{title}</div>
+            <div>{`Doanh thu: ${formatCurrency(items?.[0]?.value ?? 0)}`}</div>
+          </div>
+        ),
+      },
+    },
+  }
+
+  const patientColumns = [
     {
       title: 'Mốc thời gian',
       key: 'period',
-      render: (_, record) => formatPeriod(record, viewMode),
+      render: (_, record) => formatPeriod(record, patientViewMode),
     },
     {
       title: 'Số bệnh nhân',
@@ -121,6 +208,28 @@ export default function StatisticsPage() {
       key: 'totalPatients',
       width: 180,
       render: (value) => <Tag color="blue">{value ?? 0}</Tag>,
+    },
+  ]
+
+  const revenueColumns = [
+    {
+      title: 'Mốc thời gian',
+      key: 'period',
+      render: (_, record) => formatPeriod(record, revenueViewMode),
+    },
+    {
+      title: 'Doanh thu',
+      dataIndex: 'totalAmount',
+      key: 'totalAmount',
+      width: 220,
+      render: (value) => <Tag color="green">{formatCurrency(value)}</Tag>,
+    },
+    {
+      title: 'Số giao dịch thành công',
+      dataIndex: 'totalTransactions',
+      key: 'totalTransactions',
+      width: 180,
+      render: (value) => value ?? 0,
     },
   ]
 
@@ -132,8 +241,10 @@ export default function StatisticsPage() {
 
       <Space wrap style={{ width: '100%' }}>
         <Card style={{ minWidth: 280, flex: 1 }}>
-          <Statistic title="Doanh thu" value="Đang phát triển" />
-          <Text type="secondary">Sẽ bổ sung bộ lọc theo thời gian và biểu đồ doanh thu.</Text>
+          <Statistic title="Tổng doanh thu (toàn thời gian)" value={formatCurrency(allRevenueAmount)} />
+          <Text type="secondary">
+            Năm gần nhất: {yearlyRevenueStats[0]?.year || '-'} - {formatCurrency(latestRevenueAmount)}
+          </Text>
         </Card>
         <Card style={{ minWidth: 280, flex: 1 }}>
           <Statistic title="Tổng bệnh nhân (toàn thời gian)" value={allPatientTotal} />
@@ -150,20 +261,58 @@ export default function StatisticsPage() {
           wrap
         >
           <Title level={5} style={{ margin: 0 }}>
-            Thống kê số bệnh nhân
+            Thống kê doanh thu
           </Title>
           <Segmented
-            value={viewMode}
+            value={revenueViewMode}
             options={[
               { label: 'Theo tháng', value: VIEW_MODE.MONTHLY },
               { label: 'Theo quý', value: VIEW_MODE.QUARTERLY },
               { label: 'Theo năm', value: VIEW_MODE.YEARLY },
             ]}
-            onChange={setViewMode}
+            onChange={setRevenueViewMode}
           />
         </Space>
-        {chartData.length > 0 ? (
-          <Column {...chartConfig} />
+        {revenueChartData.length > 0 ? (
+          <Column {...revenueChartConfig} />
+        ) : (
+          <Empty description="Chưa có dữ liệu doanh thu" style={{ marginBlock: 40 }} />
+        )}
+        <Title level={5} style={{ marginBottom: 12 }}>
+          Dữ liệu chi tiết doanh thu
+        </Title>
+        <Table
+          rowKey={(record) =>
+            `revenue-${record.year || '0'}-${record.month || '0'}-${record.quarter || '0'}`
+          }
+          loading={loading}
+          columns={revenueColumns}
+          dataSource={currentRevenueStats}
+          pagination={{ pageSize: 10, showSizeChanger: false }}
+        />
+      </Card>
+
+      <Card>
+        <Space
+          style={{ width: '100%', justifyContent: 'space-between', marginBottom: 12 }}
+          align="center"
+          wrap
+        >
+          <Title level={5} style={{ margin: 0 }}>
+            Thống kê số bệnh nhân
+          </Title>
+          <Segmented
+            value={patientViewMode}
+            options={[
+              { label: 'Theo tháng', value: VIEW_MODE.MONTHLY },
+              { label: 'Theo quý', value: VIEW_MODE.QUARTERLY },
+              { label: 'Theo năm', value: VIEW_MODE.YEARLY },
+            ]}
+            onChange={setPatientViewMode}
+          />
+        </Space>
+        {patientChartData.length > 0 ? (
+          <Column {...patientChartConfig} />
         ) : (
           <Empty description="Chưa có dữ liệu thống kê" style={{ marginBlock: 40 }} />
         )}
@@ -175,7 +324,7 @@ export default function StatisticsPage() {
             `${record.year || '0'}-${record.month || '0'}-${record.quarter || '0'}`
           }
           loading={loading}
-          columns={columns}
+          columns={patientColumns}
           dataSource={currentStats}
           pagination={{ pageSize: 10, showSizeChanger: false }}
         />

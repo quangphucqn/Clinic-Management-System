@@ -1,4 +1,3 @@
-import { ReloadOutlined } from '@ant-design/icons'
 import { App, Button, Card, Descriptions, Drawer, Empty, Space, Table, Tag, Typography } from 'antd'
 import dayjs from 'dayjs'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -132,9 +131,6 @@ export default function PatientHistoryPage() {
               đoán, đơn thuốc, xét nghiệm.
             </Paragraph>
           </div>
-          <Button icon={<ReloadOutlined />} onClick={() => loadHistory({ nextPage: 1 })}>
-            Tải lại
-          </Button>
         </Space>
       </Card>
 

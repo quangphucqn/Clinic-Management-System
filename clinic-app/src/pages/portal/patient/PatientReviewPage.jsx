@@ -1,4 +1,4 @@
-import { ReloadOutlined, StarOutlined } from '@ant-design/icons'
+import { StarOutlined } from '@ant-design/icons'
 import {
   App,
   Button,
@@ -225,9 +225,6 @@ export default function PatientReviewPage() {
               Bạn chỉ có thể đánh giá bác sĩ đã khám cho mình và mỗi bác sĩ chỉ đánh giá một lần.
             </Paragraph>
           </div>
-          <Button icon={<ReloadOutlined />} onClick={() => loadCompletedAppointments({ nextPage: 1 })}>
-            Tải lại
-          </Button>
         </Space>
       </Card>
 
