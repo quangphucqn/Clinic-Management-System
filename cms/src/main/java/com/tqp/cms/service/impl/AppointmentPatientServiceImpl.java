@@ -3,9 +3,10 @@ package com.tqp.cms.service.impl;
 import com.tqp.cms.dto.request.AppointmentBookingRequest;
 import com.tqp.cms.dto.request.MomoIpnRequest;
 import com.tqp.cms.dto.response.AppointmentBookingResponse;
-import com.tqp.cms.dto.response.MomoCreatePaymentResponse;
 import com.tqp.cms.dto.response.AppointmentHistoryResponse;
+import com.tqp.cms.dto.response.AppointmentSlotAvailabilityResponse;
 import com.tqp.cms.dto.response.MedicalHistoryResponse;
+import com.tqp.cms.dto.response.MomoCreatePaymentResponse;
 import com.tqp.cms.dto.response.PageResponse;
 import com.tqp.cms.entity.Appointment;
 import com.tqp.cms.entity.AppointmentStatus;
@@ -27,10 +28,14 @@ import com.tqp.cms.service.AppointmentPatientService;
 import com.tqp.cms.service.MomoPaymentService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -47,6 +52,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AppointmentPatientServiceImpl implements AppointmentPatientService {
+    static final Set<AppointmentStatus> SLOT_OCCUPYING_STATUSES = EnumSet.of(
+            AppointmentStatus.PENDING,
+            AppointmentStatus.CONFIRMED,
+            AppointmentStatus.COMPLETED
+    );
+
     AppointmentRepository appointmentRepository;
     UsersRepository usersRepository;
     PatientRepository patientRepository;
@@ -87,22 +98,28 @@ public class AppointmentPatientServiceImpl implements AppointmentPatientService 
         if (!timeSlot.isEnabled()) {
             throw new AppException(ErrorCode.SLOT_DISABLED);
         }
+        if (request.getAppointmentDate().equals(LocalDate.now())
+                && !timeSlot.getStartTime().isAfter(LocalTime.now())) {
+            throw new AppException(ErrorCode.SLOT_TIME_PASSED);
+        }
 
-        boolean doctorSlotBooked = appointmentRepository.existsByDoctorIdAndAppointmentDateAndTimeSlotConfigIdAndActiveTrue(
+        long occupiedBookings = appointmentRepository.countByDoctorIdAndAppointmentDateAndTimeSlotConfigIdAndStatusInAndActiveTrue(
                 doctor.getId(),
                 request.getAppointmentDate(),
-                timeSlot.getId()
+                timeSlot.getId(),
+                SLOT_OCCUPYING_STATUSES
         );
-        if (doctorSlotBooked) {
-            throw new AppException(ErrorCode.APPOINTMENT_DUPLICATED);
+        if (occupiedBookings >= timeSlot.getMaxPatientsPerSlot()) {
+            throw new AppException(ErrorCode.SLOT_FULL);
         }
 
         boolean duplicatedByPatient = appointmentRepository
-                .existsByPatientIdAndDoctorIdAndAppointmentDateAndTimeSlotConfigIdAndActiveTrue(
+                .existsByPatientIdAndDoctorIdAndAppointmentDateAndTimeSlotConfigIdAndStatusInAndActiveTrue(
                         patient.getId(),
                         doctor.getId(),
                         request.getAppointmentDate(),
-                        timeSlot.getId()
+                        timeSlot.getId(),
+                        SLOT_OCCUPYING_STATUSES
                 );
         if (duplicatedByPatient) {
             throw new AppException(ErrorCode.APPOINTMENT_DUPLICATED);
@@ -234,15 +251,49 @@ public class AppointmentPatientServiceImpl implements AppointmentPatientService 
     @Override
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('PATIENT')")
-    public List<UUID> getBookedTimeSlotIds(UUID doctorId, LocalDate appointmentDate) {
+    public List<AppointmentSlotAvailabilityResponse> getBookedTimeSlotIds(UUID doctorId, LocalDate appointmentDate) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        var user = usersRepository.findByUsernameAndActiveTrue(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        var patient = patientRepository.findByUserAccountId(user.getId())
+                .filter(item -> item.isActive())
+                .orElseThrow(() -> new AppException(ErrorCode.PATIENT_NOT_FOUND));
+
         doctorRepository.findById(doctorId)
                 .filter(item -> item.isActive())
                 .orElseThrow(() -> new AppException(ErrorCode.DOCTOR_NOT_FOUND));
 
-        return appointmentRepository.findByDoctorIdAndAppointmentDateAndActiveTrue(doctorId, appointmentDate)
-                .stream()
+        var timeSlots = timeSlotConfigRepository.findByActiveTrueAndEnabledTrueOrderByStartTimeAscEndTimeAsc();
+        var appointments = appointmentRepository.findByDoctorIdAndAppointmentDateAndStatusInAndActiveTrue(
+                doctorId,
+                appointmentDate,
+                SLOT_OCCUPYING_STATUSES
+        );
+
+        Map<UUID, Long> bookedCountBySlot = appointments.stream()
+                .collect(Collectors.groupingBy(
+                        appointment -> appointment.getTimeSlotConfig().getId(),
+                        Collectors.counting()
+                ));
+        Set<UUID> slotsBookedByCurrentPatient = appointments.stream()
+                .filter(appointment -> appointment.getPatient().getId().equals(patient.getId()))
                 .map(appointment -> appointment.getTimeSlotConfig().getId())
-                .distinct()
+                .collect(Collectors.toSet());
+
+        return timeSlots.stream()
+                .map(timeSlot -> {
+                    UUID slotId = timeSlot.getId();
+                    int maxPatientsPerSlot = timeSlot.getMaxPatientsPerSlot();
+                    int bookedCount = bookedCountBySlot.getOrDefault(slotId, 0L).intValue();
+                    return AppointmentSlotAvailabilityResponse.builder()
+                            .timeSlotId(slotId)
+                            .bookedByCurrentPatient(slotsBookedByCurrentPatient.contains(slotId))
+                            .slotFull(bookedCount >= maxPatientsPerSlot)
+                            .bookedCount(bookedCount)
+                            .maxPatientsPerSlot(maxPatientsPerSlot)
+                            .build();
+                })
                 .toList();
     }
 
@@ -265,9 +316,6 @@ public class AppointmentPatientServiceImpl implements AppointmentPatientService 
         if (!appointment.getPatient().getId().equals(patient.getId())) {
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
-        if (appointment.getAppointmentDate().isBefore(LocalDate.now())) {
-            throw new AppException(ErrorCode.PAYMENT_EXPIRED);
-        }
 
         var latestTransaction = paymentTransactionRepository
                 .findTopByAppointment_IdAndActiveTrueOrderByPaidAtDesc(appointmentId)
@@ -286,6 +334,9 @@ public class AppointmentPatientServiceImpl implements AppointmentPatientService 
                     latestTransaction.getTransactionCode(),
                     null
             );
+        }
+        if (latestTransaction.getPaymentStatus() == PaymentStatus.PENDING) {
+            throw new AppException(ErrorCode.PAYMENT_IN_PROGRESS);
         }
 
         if (paymentMethod != null && paymentMethod != PaymentMethod.MOMO) {
