@@ -2,7 +2,6 @@ import {
   BellFilled,
   AppstoreOutlined,
   BarChartOutlined,
-  BellFilled,
   BellOutlined,
   CalendarOutlined,
   FileSearchOutlined,
@@ -98,9 +97,8 @@ function getMenuItemsByRole(role) {
 
   if (role === ROLES.ADMIN) {
     return [
-      { key: ROUTES.adminStatistics, icon: <BarChartOutlined />, label: 'Thống kê' },
-      { key: ROUTES.adminDepositConfig, icon: <MoneyCollectOutlined />, label: 'Tiền đặt cọc khám' },
       { key: ROUTES.adminNotifications, icon: <BellOutlined />, label: 'Quản lý thông báo' },
+      { key: ROUTES.adminDepositConfig, icon: <MoneyCollectOutlined />, label: 'Cấu hình tiền đặt cọc' },
       { key: ROUTES.adminTimeslots, icon: <ClockCircleOutlined />, label: 'Quản lý giờ khám' },
       { key: ROUTES.adminSpecialties, icon: <ClusterOutlined />, label: 'Quản lý chuyên khoa' },
       { key: ROUTES.adminDoctors, icon: <TeamOutlined />, label: 'Quản lý bác sĩ' },
