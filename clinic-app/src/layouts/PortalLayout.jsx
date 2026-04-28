@@ -1,5 +1,4 @@
 import {
-  BellFilled,
   AppstoreOutlined,
   BarChartOutlined,
   BellFilled,
