@@ -48,7 +48,7 @@ export default function AppointmentBookingPage() {
   const [specialties, setSpecialties] = useState([])
   const [doctors, setDoctors] = useState([])
   const [timeSlots, setTimeSlots] = useState([])
-  const [bookedSlotIds, setBookedSlotIds] = useState([])
+  const [slotAvailabilities, setSlotAvailabilities] = useState([])
   const [depositAmount, setDepositAmount] = useState(0)
 
   useEffect(() => {
@@ -110,21 +110,42 @@ export default function AppointmentBookingPage() {
     }))
   }, [doctors, selectedSpecialtyId])
 
-  const bookedSlotIdSet = useMemo(() => new Set(bookedSlotIds), [bookedSlotIds])
+  const slotAvailabilityMap = useMemo(() => {
+    const map = new Map()
+    slotAvailabilities.forEach((item) => {
+      if (item?.timeSlotId) map.set(item.timeSlotId, item)
+    })
+    return map
+  }, [slotAvailabilities])
 
   const slotOptions = useMemo(() => {
     if (!selectedDoctorId || !selectedDate) return []
+    const isToday = selectedDate.isSame(dayjs(), 'day')
+    const currentTime = dayjs().format('HH:mm:ss')
     return timeSlots
       .filter((slot) => slot.enabled !== false)
+      .filter((slot) => {
+        if (!isToday) return true
+        if (!slot?.startTime) return false
+        return slot.startTime > currentTime
+      })
       .map((slot) => {
-        const isBooked = bookedSlotIdSet.has(slot.id)
+        const availability = slotAvailabilityMap.get(slot.id)
+        const bookedByCurrentPatient = Boolean(availability?.bookedByCurrentPatient)
+        const slotFull = Boolean(availability?.slotFull)
+        const isBooked = bookedByCurrentPatient || slotFull
+        const labelSuffix = bookedByCurrentPatient
+          ? ' - đã đặt lịch'
+          : slotFull
+            ? ' - đã hết slot'
+            : ''
         return {
           value: slot.id,
-          label: isBooked ? `${toTimeLabel(slot)} - đã có lịch` : toTimeLabel(slot),
+          label: `${toTimeLabel(slot)}${labelSuffix}`,
           disabled: isBooked,
         }
       })
-  }, [bookedSlotIdSet, selectedDate, selectedDoctorId, timeSlots])
+  }, [selectedDate, selectedDoctorId, slotAvailabilityMap, timeSlots])
 
   const selectedDoctorLabel = useMemo(
     () => doctorOptions.find((item) => item.value === selectedDoctorId)?.label,
@@ -140,7 +161,7 @@ export default function AppointmentBookingPage() {
 
     async function loadBookedSlots() {
       if (!selectedDoctorId || !selectedDate) {
-        setBookedSlotIds([])
+        setSlotAvailabilities([])
         return
       }
 
@@ -150,10 +171,10 @@ export default function AppointmentBookingPage() {
           appointmentDate: selectedDate.format('YYYY-MM-DD'),
         })
         if (!active) return
-        setBookedSlotIds(response?.result || [])
+        setSlotAvailabilities(response?.result || [])
       } catch {
         if (!active) return
-        setBookedSlotIds([])
+        setSlotAvailabilities([])
       }
     }
 
