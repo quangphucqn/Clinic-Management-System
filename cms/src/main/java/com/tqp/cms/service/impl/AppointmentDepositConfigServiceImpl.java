@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AppointmentDepositConfigServiceImpl implements AppointmentDepositConfigService {
     static final String DEPOSIT_SETTING_KEY = "APPOINTMENT_DEPOSIT_AMOUNT";
-    static final BigDecimal DEFAULT_DEPOSIT_AMOUNT = new BigDecimal("100000.00");
+    static final BigDecimal DEFAULT_DEPOSIT_AMOUNT = new BigDecimal("100000");
     static final String CURRENCY = "VND";
 
     SystemSettingRepository systemSettingRepository;
@@ -70,7 +70,7 @@ public class AppointmentDepositConfigServiceImpl implements AppointmentDepositCo
     }
 
     private BigDecimal normalizeAmount(BigDecimal amount) {
-        return amount.setScale(2, RoundingMode.HALF_UP);
+        return amount.setScale(0, RoundingMode.HALF_UP);
     }
 
     private AppointmentDepositConfigResponse toResponse(BigDecimal amount) {

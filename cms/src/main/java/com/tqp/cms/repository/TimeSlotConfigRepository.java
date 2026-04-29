@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,4 +17,6 @@ public interface TimeSlotConfigRepository extends JpaRepository<TimeSlotConfig, 
     Page<TimeSlotConfig> findByActiveTrue(Pageable pageable);
 
     Page<TimeSlotConfig> findByActiveTrueAndSlotCodeContainingIgnoreCase(String slotCode, Pageable pageable);
+
+    List<TimeSlotConfig> findByActiveTrueAndEnabledTrueOrderByStartTimeAscEndTimeAsc();
 }
