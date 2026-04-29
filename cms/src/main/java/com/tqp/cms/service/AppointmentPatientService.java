@@ -4,6 +4,7 @@ import com.tqp.cms.dto.request.AppointmentBookingRequest;
 import com.tqp.cms.dto.request.MomoIpnRequest;
 import com.tqp.cms.dto.response.AppointmentBookingResponse;
 import com.tqp.cms.dto.response.AppointmentHistoryResponse;
+import com.tqp.cms.dto.response.AppointmentSlotAvailabilityResponse;
 import com.tqp.cms.dto.response.MedicalHistoryResponse;
 import com.tqp.cms.dto.response.PageResponse;
 import com.tqp.cms.entity.AppointmentStatus;
@@ -20,7 +21,7 @@ public interface AppointmentPatientService {
 
     PageResponse<MedicalHistoryResponse> getMyMedicalHistory(int page, int size);
 
-    List<UUID> getBookedTimeSlotIds(UUID doctorId, LocalDate appointmentDate);
+    List<AppointmentSlotAvailabilityResponse> getBookedTimeSlotIds(UUID doctorId, LocalDate appointmentDate);
 
     AppointmentBookingResponse retryAppointmentPayment(UUID appointmentId, PaymentMethod paymentMethod);
 
