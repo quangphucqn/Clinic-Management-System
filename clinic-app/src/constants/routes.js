@@ -15,7 +15,6 @@ export const ROUTES = {
   doctorPatientHistory: '/app/doctor/patient-history',
   doctorExamination: (appointmentId) => `/app/doctor/schedule/${appointmentId}/examination`,
   adminTimeslots: '/app/admin/timeslots',
-  adminTimeSlotCapacity: '/app/admin/timeslot-capacity',
   adminDepositConfig: '/app/admin/deposit-config',
   adminStatistics: '/app/admin/statistics',
   adminDoctors: '/app/admin/doctors',
