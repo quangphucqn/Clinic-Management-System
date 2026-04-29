@@ -2,7 +2,6 @@ import {
   BellFilled,
   AppstoreOutlined,
   BarChartOutlined,
-  BellFilled,
   BellOutlined,
   CalendarOutlined,
   FileSearchOutlined,
