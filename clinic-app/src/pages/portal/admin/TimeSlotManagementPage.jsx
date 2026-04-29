@@ -159,7 +159,7 @@ export default function TimeSlotManagementPage() {
 
   const columns = [
     {
-      title: 'Mã slot',
+      title: 'Mã giờ khám',
       dataIndex: 'slotCode',
       key: 'slotCode',
       width: 210,
@@ -277,10 +277,10 @@ export default function TimeSlotManagementPage() {
       >
         <Form form={form} layout="vertical" initialValues={{ enabled: true }}>
           <Form.Item
-            label="Mã slot"
+            label="Mã giờ khám"
             name="slotCode"
             rules={[
-              { required: !editingTimeSlot, message: 'Vui lòng nhập mã slot' },
+              { required: !editingTimeSlot, message: 'Vui lòng nhập mã giờ khám' },
               { max: 30, message: 'Tối đa 30 ký tự' },
             ]}
           >
