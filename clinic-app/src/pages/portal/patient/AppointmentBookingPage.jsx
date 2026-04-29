@@ -37,7 +37,14 @@ const PAYMENT_METHODS = {
 
 function toTimeLabel(slot) {
   if (!slot?.startTime || !slot?.endTime) return slot?.slotCode || 'Khung giờ'
-  return `${slot.startTime.slice(0, 5)} - ${slot.endTime.slice(0, 5)} (${slot.slotCode || 'N/A'})`
+  return `${slot.startTime.slice(0, 5)} - ${slot.endTime.slice(0, 5)}`
+}
+
+function getSessionByStartTime(startTime) {
+  if (!startTime) return 'Khác'
+  const hour = Number(startTime.slice(0, 2))
+  if (Number.isNaN(hour)) return 'Khác'
+  return hour < 12 ? 'Buổi sáng' : 'Buổi chiều'
 }
 
 export default function AppointmentBookingPage() {
@@ -122,7 +129,7 @@ export default function AppointmentBookingPage() {
     if (!selectedDoctorId || !selectedDate) return []
     const isToday = selectedDate.isSame(dayjs(), 'day')
     const currentTime = dayjs().format('HH:mm:ss')
-    return timeSlots
+    const mapped = timeSlots
       .filter((slot) => slot.enabled !== false)
       .filter((slot) => {
         if (!isToday) return true
@@ -143,17 +150,42 @@ export default function AppointmentBookingPage() {
           value: slot.id,
           label: `${toTimeLabel(slot)}${labelSuffix}`,
           disabled: isBooked,
+          session: getSessionByStartTime(slot.startTime),
         }
       })
+
+    const grouped = mapped.reduce((acc, option) => {
+      const group = acc[option.session] || []
+      group.push({
+        value: option.value,
+        label: option.label,
+        disabled: option.disabled,
+      })
+      acc[option.session] = group
+      return acc
+    }, {})
+
+    const orderedSessions = ['Buổi sáng', 'Buổi chiều', 'Khác']
+    return orderedSessions
+      .filter((session) => grouped[session]?.length)
+      .map((session) => ({
+        label: session,
+        options: grouped[session],
+      }))
   }, [selectedDate, selectedDoctorId, slotAvailabilityMap, timeSlots])
+
+  const flatSlotOptions = useMemo(
+    () => slotOptions.flatMap((group) => group.options || []),
+    [slotOptions],
+  )
 
   const selectedDoctorLabel = useMemo(
     () => doctorOptions.find((item) => item.value === selectedDoctorId)?.label,
     [doctorOptions, selectedDoctorId],
   )
   const selectedSlotLabel = useMemo(
-    () => slotOptions.find((item) => item.value === selectedTimeSlotId)?.label,
-    [selectedTimeSlotId, slotOptions],
+    () => flatSlotOptions.find((item) => item.value === selectedTimeSlotId)?.label,
+    [flatSlotOptions, selectedTimeSlotId],
   )
 
   useEffect(() => {
