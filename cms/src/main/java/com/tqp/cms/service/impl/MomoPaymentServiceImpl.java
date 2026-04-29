@@ -7,6 +7,7 @@ import com.tqp.cms.dto.request.MomoIpnRequest;
 import com.tqp.cms.dto.response.MomoCreatePaymentResponse;
 import com.tqp.cms.service.MomoPaymentService;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -39,7 +40,13 @@ public class MomoPaymentServiceImpl implements MomoPaymentService {
 
         try {
             String requestId = orderId;
-            String amountValue = amount.stripTrailingZeros().toPlainString();
+            String amountValue = normalizeAmountForMomo(amount);
+            if (amountValue == null) {
+                return MomoCreatePaymentResponse.builder()
+                        .resultCode(96)
+                        .message("Invalid payment amount for MoMo")
+                        .build();
+            }
             String extraData = "";
 
             String rawSignature = "accessKey=%s&amount=%s&extraData=%s&ipnUrl=%s&orderId=%s&orderInfo=%s&partnerCode=%s&redirectUrl=%s&requestId=%s&requestType=%s"
@@ -146,5 +153,16 @@ public class MomoPaymentServiceImpl implements MomoPaymentService {
 
     private String defaultString(String value) {
         return value == null ? "" : value;
+    }
+
+    private String normalizeAmountForMomo(BigDecimal amount) {
+        if (amount == null) {
+            return null;
+        }
+        BigDecimal normalized = amount.setScale(0, RoundingMode.HALF_UP);
+        if (normalized.compareTo(BigDecimal.valueOf(1000)) < 0) {
+            return null;
+        }
+        return normalized.toPlainString();
     }
 }

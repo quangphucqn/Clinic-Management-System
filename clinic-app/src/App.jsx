@@ -16,6 +16,7 @@ import MedicineManagementPage from './pages/portal/admin/MedicineManagementPage.
 import DoctorManagementPage from './pages/portal/admin/DoctorManagementPage.jsx'
 import SpecialtyManagementPage from './pages/portal/admin/SpecialtyManagementPage.jsx'
 import TimeSlotManagementPage from './pages/portal/admin/TimeSlotManagementPage.jsx'
+import TimeSlotCapacityPage from './pages/portal/admin/TimeSlotCapacityPage.jsx'
 import UnitManagementPage from './pages/portal/admin/UnitManagementPage.jsx'
 import StatisticsPage from './pages/portal/admin/StatisticsPage.jsx'
 import NotificationManagementPage from './pages/portal/admin/NotificationManagementPage.jsx'
@@ -162,6 +163,14 @@ export default function App() {
                 element={
                   <RequireRole roles={[ROLES.ADMIN]}>
                     <TimeSlotManagementPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="admin/timeslot-capacity"
+                element={
+                  <RequireRole roles={[ROLES.ADMIN]}>
+                    <TimeSlotCapacityPage />
                   </RequireRole>
                 }
               />

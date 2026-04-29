@@ -1,5 +1,4 @@
 import {
-  BellFilled,
   AppstoreOutlined,
   BarChartOutlined,
   BellOutlined,
@@ -99,10 +98,11 @@ function getMenuItemsByRole(role) {
     return [
       { key: ROUTES.adminStatistics, icon: <BarChartOutlined />, label: 'Thống kê' },
       { key: ROUTES.adminDepositConfig, icon: <MoneyCollectOutlined />, label: 'Tiền đặt cọc khám' },
-      { key: ROUTES.adminNotifications, icon: <BellOutlined />, label: 'Quản lý thông báo' },
       { key: ROUTES.adminTimeslots, icon: <ClockCircleOutlined />, label: 'Quản lý giờ khám' },
+      { key: ROUTES.adminTimeSlotCapacity, icon: <ClockCircleOutlined />, label: 'Quản lý số slot giờ khám' },
       { key: ROUTES.adminSpecialties, icon: <ClusterOutlined />, label: 'Quản lý chuyên khoa' },
       { key: ROUTES.adminDoctors, icon: <TeamOutlined />, label: 'Quản lý bác sĩ' },
+      { key: ROUTES.adminNotifications, icon: <BellOutlined />, label: 'Quản lý thông báo' },
       {
         key: ROUTES.adminUnits,
         icon: <AppstoreOutlined />,
@@ -113,7 +113,6 @@ function getMenuItemsByRole(role) {
         icon: <MedicineBoxOutlined />,
         label: 'Quản lý thuốc',
       },
-      { key: ROUTES.adminStatistics, icon: <BarChartOutlined />, label: 'Thống kê' },
     ]
   }
 
