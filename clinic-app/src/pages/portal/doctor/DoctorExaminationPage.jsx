@@ -277,7 +277,14 @@ export default function DoctorExaminationPage() {
       await loadExaminationData()
     } catch (error) {
       if (error?.errorFields) return
+    
+    // Check nếu BE trả về lỗi về prescription đã tồn tại
+    const errorMsg = error?.response?.data?.message || error?.message || ''
+    if (errorMsg.toLowerCase().includes('prescription') || errorMsg.toLowerCase().includes('already exists')) {
+      message.error('Không thể tạo yêu cầu xét nghiệm')
+    } else {
       message.error(getErrorMessage(error))
+    }
     } finally {
       setLabOrderSaving(false)
     }
@@ -533,6 +540,101 @@ export default function DoctorExaminationPage() {
                 )}
               </Card>
 
+
+              <Card className="doctor-examination__section">
+                <div className="doctor-examination__section-header">
+                  <Space>
+                    <ExperimentOutlined />
+                    <Title level={4} style={{ margin: 0 }}>
+                      Xét nghiệm và kết quả
+                    </Title>
+                  </Space>
+                </div>
+
+                {!medicalRecord ? (
+                  <Empty style={{ marginTop: 16 }} description="Tạo bệnh án trước để chỉ định xét nghiệm" />
+                ) : (
+                  <Space direction="vertical" size="middle" style={{ width: '100%', marginTop: 16 }}>
+                    <Form form={labOrderForm} layout="vertical">
+                      <Row gutter={12}>
+                        <Col xs={24} md={10}>
+                          <Form.Item
+                            label="Tên xét nghiệm"
+                            name="testName"
+                            rules={[{ required: true, message: 'Vui lòng nhập tên xét nghiệm' }]}
+                          >
+                            <Input placeholder="Ví dụ: Xét nghiệm chức năng thận" />
+                          </Form.Item>
+                        </Col>
+                        <Col xs={24} md={14}>
+                          <Form.Item label="Ghi chú chỉ định" name="requestNote">
+                            <Input placeholder="Ví dụ: Xét nghiệm máu" />
+                          </Form.Item>
+                        </Col>
+                      </Row>
+                      <Button type="primary" loading={labOrderSaving} onClick={handleCreateLabOrder}>
+                        Thêm yêu cầu xét nghiệm
+                      </Button>
+                    </Form>
+
+                    {labTests.length ? (
+                      <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                        {labTests.map((labTest) => {
+                          const statusMeta = getLabStatusMeta(labTest.status)
+                          return (
+                            <Card key={labTest.id} size="small" className="doctor-examination__lab-item">
+                              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                                <div className="doctor-examination__section-header">
+                                  <div>
+                                    <Text strong>{labTest.testName || '-'}</Text>
+                                    <br />
+                                    <Text type="secondary">
+                                      {labTest.requestNote || 'Không có ghi chú chỉ định'}
+                                    </Text>
+                                  </div>
+                                  <Space wrap>
+                                    <Tag color={statusMeta.color}>{statusMeta.label}</Tag>
+                                    {labTest.result ? (
+                                      <Button onClick={() => openLabResultModal(labTest)}>
+                                        Xem kết quả
+                                      </Button>
+                                    ) : (
+                                      <Button type="primary" onClick={() => openLabResultModal(labTest)}>
+                                        Nhập kết quả
+                                      </Button>
+                                    )}
+                                  </Space>
+                                </div>
+
+                                {labTest.result ? (
+                                  <div className="doctor-examination__result-block">
+                                    <Descriptions size="small" column={1}>
+                                      <Descriptions.Item label="Kết quả">
+                                        {labTest.result.resultValue || '-'}
+                                      </Descriptions.Item>
+                                      <Descriptions.Item label="Normal Range">
+                                        {labTest.result.normalRange || '-'}
+                                      </Descriptions.Item>
+                                      <Descriptions.Item label="Tệp đính kèm">
+                                        {labTest.result.attachmentUrl || '-'}
+                                      </Descriptions.Item>
+                                    </Descriptions>
+                                  </div>
+                                ) : (
+                                  <Text type="secondary">Chưa có kết quả xét nghiệm.</Text>
+                                )}
+                              </Space>
+                            </Card>
+                          )
+                        })}
+                      </Space>
+                    ) : (
+                      <Empty description="Chưa có yêu cầu xét nghiệm nào" />
+                    )}
+                  </Space>
+                )}
+              </Card>
+
               <Card className="doctor-examination__section">
                 <div className="doctor-examination__section-header">
                   <Space>
@@ -697,100 +799,6 @@ export default function DoctorExaminationPage() {
                       )}
                     </Form.List>
                   </Form>
-                )}
-              </Card>
-
-              <Card className="doctor-examination__section">
-                <div className="doctor-examination__section-header">
-                  <Space>
-                    <ExperimentOutlined />
-                    <Title level={4} style={{ margin: 0 }}>
-                      Xét nghiệm và kết quả
-                    </Title>
-                  </Space>
-                </div>
-
-                {!medicalRecord ? (
-                  <Empty style={{ marginTop: 16 }} description="Tạo bệnh án trước để chỉ định xét nghiệm" />
-                ) : (
-                  <Space direction="vertical" size="middle" style={{ width: '100%', marginTop: 16 }}>
-                    <Form form={labOrderForm} layout="vertical">
-                      <Row gutter={12}>
-                        <Col xs={24} md={10}>
-                          <Form.Item
-                            label="Tên xét nghiệm"
-                            name="testName"
-                            rules={[{ required: true, message: 'Vui lòng nhập tên xét nghiệm' }]}
-                          >
-                            <Input placeholder="Ví dụ: Xét nghiệm chức năng thận" />
-                          </Form.Item>
-                        </Col>
-                        <Col xs={24} md={14}>
-                          <Form.Item label="Ghi chú chỉ định" name="requestNote">
-                            <Input placeholder="Ví dụ: Xét nghiệm máu" />
-                          </Form.Item>
-                        </Col>
-                      </Row>
-                      <Button type="primary" loading={labOrderSaving} onClick={handleCreateLabOrder}>
-                        Thêm yêu cầu xét nghiệm
-                      </Button>
-                    </Form>
-
-                    {labTests.length ? (
-                      <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                        {labTests.map((labTest) => {
-                          const statusMeta = getLabStatusMeta(labTest.status)
-                          return (
-                            <Card key={labTest.id} size="small" className="doctor-examination__lab-item">
-                              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                                <div className="doctor-examination__section-header">
-                                  <div>
-                                    <Text strong>{labTest.testName || '-'}</Text>
-                                    <br />
-                                    <Text type="secondary">
-                                      {labTest.requestNote || 'Không có ghi chú chỉ định'}
-                                    </Text>
-                                  </div>
-                                  <Space wrap>
-                                    <Tag color={statusMeta.color}>{statusMeta.label}</Tag>
-                                    {labTest.result ? (
-                                      <Button onClick={() => openLabResultModal(labTest)}>
-                                        Xem kết quả
-                                      </Button>
-                                    ) : (
-                                      <Button type="primary" onClick={() => openLabResultModal(labTest)}>
-                                        Nhập kết quả
-                                      </Button>
-                                    )}
-                                  </Space>
-                                </div>
-
-                                {labTest.result ? (
-                                  <div className="doctor-examination__result-block">
-                                    <Descriptions size="small" column={1}>
-                                      <Descriptions.Item label="Kết quả">
-                                        {labTest.result.resultValue || '-'}
-                                      </Descriptions.Item>
-                                      <Descriptions.Item label="Normal Range">
-                                        {labTest.result.normalRange || '-'}
-                                      </Descriptions.Item>
-                                      <Descriptions.Item label="Tệp đính kèm">
-                                        {labTest.result.attachmentUrl || '-'}
-                                      </Descriptions.Item>
-                                    </Descriptions>
-                                  </div>
-                                ) : (
-                                  <Text type="secondary">Chưa có kết quả xét nghiệm.</Text>
-                                )}
-                              </Space>
-                            </Card>
-                          )
-                        })}
-                      </Space>
-                    ) : (
-                      <Empty description="Chưa có yêu cầu xét nghiệm nào" />
-                    )}
-                  </Space>
                 )}
               </Card>
             </Space>

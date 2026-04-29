@@ -9,10 +9,7 @@ import com.tqp.cms.exception.AppException;
 import com.tqp.cms.exception.ErrorCode;
 import com.tqp.cms.mapper.LabTestMapper;
 import com.tqp.cms.mapper.LabTestOderMapper;
-import com.tqp.cms.repository.DoctorRepository;
-import com.tqp.cms.repository.LabTestOrderRepository;
-import com.tqp.cms.repository.MedicalRecordRepository;
-import com.tqp.cms.repository.UsersRepository;
+import com.tqp.cms.repository.*;
 import com.tqp.cms.service.LabTestOrderService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +31,7 @@ public class LabTestOrderServiceImpl implements LabTestOrderService {
     LabTestMapper labTestMapper;
     UsersRepository usersRepository;
     DoctorRepository doctorRepository;
+    PrescriptionRepository prescriptionRepo;
 
 
     @Override
@@ -54,6 +52,10 @@ public class LabTestOrderServiceImpl implements LabTestOrderService {
 
         if (!record.getDoctor().getId().equals(doctor.getId())) {
             throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
+
+        if (prescriptionRepo.existsByMedicalRecordId(record.getId())) {
+            throw new AppException(ErrorCode.PRESCRIPTION_EXISTED);
         }
 
         return labTestOderMapper.toResponse(

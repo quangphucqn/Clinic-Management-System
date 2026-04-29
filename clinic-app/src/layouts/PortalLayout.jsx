@@ -1,8 +1,8 @@
 import {
   AppstoreOutlined,
   BarChartOutlined,
-  BellFilled,
   BellOutlined,
+  BellFilled,
   CalendarOutlined,
   FileSearchOutlined,
   ClusterOutlined,

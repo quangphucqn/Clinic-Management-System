@@ -53,12 +53,26 @@ public class AppointmentDoctorServiceImpl implements AppointmentDoctorService {
         Pageable pageable = PageRequest.of(
                 request.getPage(),
                 request.getSize(),
-                Sort.by("appointmentDate").descending()
+                Sort.by("CreatedAt").descending()
         );
 
         Page<Appointment> appointments;
 
-        if (request.getAppointmentDate() != null && request.getStatus() != null) {
+        if (request.getPatientName() != null
+                && !request.getPatientName().isBlank()
+                && request.getAppointmentDate() != null) {
+
+            appointments = appointmentRepository
+                    .findByDoctorIdAndPatient_UserAccount_FullNameContainingIgnoreCaseAndAppointmentDate(
+                            doctor.getId(),
+                            request.getPatientName(),
+                            request.getAppointmentDate(),
+                            pageable
+                    );
+
+        } else if (request.getAppointmentDate() != null
+                && request.getStatus() != null) {
+
             appointments = appointmentRepository
                     .findByDoctorIdAndAppointmentDateAndStatus(
                             doctor.getId(),
@@ -66,30 +80,32 @@ public class AppointmentDoctorServiceImpl implements AppointmentDoctorService {
                             request.getStatus(),
                             pageable
                     );
+
         } else if (request.getAppointmentDate() != null) {
+
             appointments = appointmentRepository
                     .findByDoctorIdAndAppointmentDate(
                             doctor.getId(),
                             request.getAppointmentDate(),
                             pageable
                     );
+
         } else if (request.getStatus() != null) {
+
             appointments = appointmentRepository
                     .findByDoctorIdAndStatus(
                             doctor.getId(),
                             request.getStatus(),
                             pageable
                     );
-        } else if (request.getPatientName() != null && !request.getPatientName().isBlank()) {
+
+        } else {
+
             appointments = appointmentRepository
-                    .findByDoctorIdAndPatient_UserAccount_FullNameContainingIgnoreCase(
+                    .findByDoctorId(
                             doctor.getId(),
-                            request.getPatientName(),
                             pageable
                     );
-        } else {
-            appointments = appointmentRepository
-                    .findByDoctorId(doctor.getId(), pageable);
         }
 
         return PageResponse.<AppointmentDoctorResponse>builder()
