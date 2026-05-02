@@ -1,5 +1,11 @@
-import { Column } from '@ant-design/plots'
-import { App, Card, Empty, Segmented, Space, Statistic, Table, Tag, Typography } from 'antd'
+import { Column, Line } from '@ant-design/plots'
+import {
+  BarChartOutlined,
+  FileTextOutlined,
+  RiseOutlined,
+  UserOutlined,
+} from '@ant-design/icons'
+import { App, Button, Card, Col, Empty, Row, Select, Space, Statistic, Typography } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import {
   getPatientStatisticsByMonth,
@@ -15,42 +21,107 @@ import { getErrorMessage } from '../../../utils/httpError.js'
 
 const { Title, Text } = Typography
 
-const VIEW_MODE = {
+const CYCLE = {
   MONTHLY: 'MONTHLY',
   QUARTERLY: 'QUARTERLY',
   YEARLY: 'YEARLY',
 }
 
-function formatPeriod(record, mode) {
-  if (mode === VIEW_MODE.MONTHLY) return `${record.month}/${record.year}`
-  if (mode === VIEW_MODE.QUARTERLY) return `Q${record.quarter}/${record.year}`
-  return `${record.year}`
+function toAmountNumber(value) {
+  const amount = Number(value)
+  if (!Number.isFinite(amount)) return 0
+  return amount
+}
+
+function formatCurrency(value) {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    maximumFractionDigits: 0,
+  }).format(toAmountNumber(value))
+}
+
+function cycleLabel(cycle) {
+  if (cycle === CYCLE.MONTHLY) return 'Theo tháng'
+  if (cycle === CYCLE.QUARTERLY) return 'Theo quý'
+  return 'Theo năm'
+}
+
+function buildRevenueSeries(cycle, year, monthlyRevenueStats, quarterlyRevenueStats, yearlyRevenueStats) {
+  if (!year) return []
+  if (cycle === CYCLE.MONTHLY) {
+    const map = new Map(monthlyRevenueStats.filter((item) => item.year === year).map((item) => [item.month, item]))
+    return Array.from({ length: 12 }, (_, index) => {
+      const month = index + 1
+      const found = map.get(month)
+      return {
+        periodLabel: `T${month}`,
+        amount: Number(found?.totalAmount || 0),
+        transactions: Number(found?.totalTransactions || 0),
+      }
+    })
+  }
+
+  if (cycle === CYCLE.QUARTERLY) {
+    const map = new Map(quarterlyRevenueStats.filter((item) => item.year === year).map((item) => [item.quarter, item]))
+    return Array.from({ length: 4 }, (_, index) => {
+      const quarter = index + 1
+      const found = map.get(quarter)
+      return {
+        periodLabel: `Q${quarter}`,
+        amount: Number(found?.totalAmount || 0),
+        transactions: Number(found?.totalTransactions || 0),
+      }
+    })
+  }
+
+  const yearly = yearlyRevenueStats.find((item) => item.year === year)
+  return [
+    {
+      periodLabel: `${year}`,
+      amount: Number(yearly?.totalAmount || 0),
+      transactions: Number(yearly?.totalTransactions || 0),
+    },
+  ]
+}
+
+function buildPatientSeries(cycle, year, monthlyStats, quarterlyStats, yearlyStats) {
+  if (!year) return []
+  if (cycle === CYCLE.MONTHLY) {
+    const map = new Map(monthlyStats.filter((item) => item.year === year).map((item) => [item.month, item]))
+    return Array.from({ length: 12 }, (_, index) => {
+      const month = index + 1
+      const found = map.get(month)
+      return { periodLabel: `T${month}`, totalPatients: Number(found?.totalPatients || 0) }
+    })
+  }
+
+  if (cycle === CYCLE.QUARTERLY) {
+    const map = new Map(quarterlyStats.filter((item) => item.year === year).map((item) => [item.quarter, item]))
+    return Array.from({ length: 4 }, (_, index) => {
+      const quarter = index + 1
+      const found = map.get(quarter)
+      return { periodLabel: `Q${quarter}`, totalPatients: Number(found?.totalPatients || 0) }
+    })
+  }
+
+  const yearly = yearlyStats.find((item) => item.year === year)
+  return [{ periodLabel: `${year}`, totalPatients: Number(yearly?.totalPatients || 0) }]
 }
 
 export default function StatisticsPage() {
   const { message } = App.useApp()
   const [loading, setLoading] = useState(false)
-  const [patientViewMode, setPatientViewMode] = useState(VIEW_MODE.MONTHLY)
-  const [revenueViewMode, setRevenueViewMode] = useState(VIEW_MODE.MONTHLY)
+  const [selectedYear, setSelectedYear] = useState(undefined)
+  const [selectedCycle, setSelectedCycle] = useState(CYCLE.MONTHLY)
+  const [appliedYear, setAppliedYear] = useState(undefined)
+  const [appliedCycle, setAppliedCycle] = useState(CYCLE.MONTHLY)
   const [monthlyStats, setMonthlyStats] = useState([])
   const [quarterlyStats, setQuarterlyStats] = useState([])
   const [yearlyStats, setYearlyStats] = useState([])
   const [monthlyRevenueStats, setMonthlyRevenueStats] = useState([])
   const [quarterlyRevenueStats, setQuarterlyRevenueStats] = useState([])
   const [yearlyRevenueStats, setYearlyRevenueStats] = useState([])
-
-  function toAmountNumber(value) {
-    const numberValue = Number(value)
-    return Number.isFinite(numberValue) ? numberValue : 0
-  }
-
-  function formatCurrency(value) {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-      maximumFractionDigits: 0,
-    }).format(toAmountNumber(value))
-  }
 
   async function loadStatistics() {
     setLoading(true)
@@ -70,6 +141,7 @@ export default function StatisticsPage() {
         getRevenueStatisticsByQuarter(),
         getRevenueStatisticsByYear(),
       ])
+
       setMonthlyStats(monthlyRes?.result || [])
       setQuarterlyStats(quarterlyRes?.result || [])
       setYearlyStats(yearlyRes?.result || [])
@@ -88,248 +160,204 @@ export default function StatisticsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const currentStats = useMemo(() => {
-    if (patientViewMode === VIEW_MODE.QUARTERLY) return quarterlyStats
-    if (patientViewMode === VIEW_MODE.YEARLY) return yearlyStats
-    return monthlyStats
-  }, [monthlyStats, patientViewMode, quarterlyStats, yearlyStats])
+  const yearOptions = useMemo(() => {
+    const years = new Set()
+    yearlyStats.forEach((item) => {
+      if (item.year) years.add(item.year)
+    })
+    yearlyRevenueStats.forEach((item) => {
+      if (item.year) years.add(item.year)
+    })
+    return Array.from(years)
+      .sort((a, b) => b - a)
+      .map((year) => ({ label: `${year}`, value: year }))
+  }, [yearlyRevenueStats, yearlyStats])
 
-  const currentRevenueStats = useMemo(() => {
-    if (revenueViewMode === VIEW_MODE.QUARTERLY) return quarterlyRevenueStats
-    if (revenueViewMode === VIEW_MODE.YEARLY) return yearlyRevenueStats
-    return monthlyRevenueStats
-  }, [monthlyRevenueStats, quarterlyRevenueStats, revenueViewMode, yearlyRevenueStats])
+  useEffect(() => {
+    if (!yearOptions.length) return
+    if (selectedYear !== undefined) return
+    const latestYear = yearOptions[0].value
+    setSelectedYear(latestYear)
+    setAppliedYear(latestYear)
+  }, [selectedYear, yearOptions])
 
-  const latestYearlyTotal = yearlyStats[0]?.totalPatients ?? 0
-  const allPatientTotal = yearlyStats.reduce(
-    (sum, item) => sum + (item.totalPatients || 0),
-    0,
-  )
-  const latestRevenueAmount = yearlyRevenueStats[0]?.totalAmount ?? 0
-  const allRevenueAmount = yearlyRevenueStats.reduce(
-    (sum, item) => sum + toAmountNumber(item.totalAmount),
-    0,
-  )
-
-  const patientChartData = useMemo(
-    () =>
-      currentStats
-        .slice()
-        .reverse()
-        .map((item) => ({
-          period: formatPeriod(item, patientViewMode),
-          totalPatients: item.totalPatients || 0,
-        })),
-    [currentStats, patientViewMode],
-  )
-
-  const revenueChartData = useMemo(
-    () =>
-      currentRevenueStats
-        .slice()
-        .reverse()
-        .map((item) => ({
-          period: formatPeriod(item, revenueViewMode),
-          totalAmount: toAmountNumber(item.totalAmount),
-        })),
-    [currentRevenueStats, revenueViewMode],
-  )
-
-  const patientChartConfig = {
-    data: patientChartData,
-    xField: 'period',
-    yField: 'totalPatients',
-    color: '#6cc5d8',
-    autoFit: true,
-    height: 360,
-    label: {
-      position: 'top',
-      style: {
-        fill: '#4a4a4a',
-      },
-    },
-    axis: {
-      y: {
-        title: 'Số bệnh nhân',
-      },
-      x: {
-        title: 'Mốc thời gian',
-      },
-    },
-    interaction: {
-      tooltip: {
-        render: (_event, { title, items }) => (
-          <div style={{ padding: 8 }}>
-            <div style={{ marginBottom: 6, fontWeight: 600 }}>{title}</div>
-            <div>{`Số bệnh nhân: ${items?.[0]?.value ?? 0}`}</div>
-          </div>
-        ),
-      },
-    },
+  function applyFilter() {
+    setAppliedYear(selectedYear)
+    setAppliedCycle(selectedCycle)
   }
+
+  const revenueSeries = useMemo(
+    () =>
+      buildRevenueSeries(
+        appliedCycle,
+        appliedYear,
+        monthlyRevenueStats,
+        quarterlyRevenueStats,
+        yearlyRevenueStats,
+      ),
+    [appliedCycle, appliedYear, monthlyRevenueStats, quarterlyRevenueStats, yearlyRevenueStats],
+  )
+
+  const patientSeries = useMemo(
+    () => buildPatientSeries(appliedCycle, appliedYear, monthlyStats, quarterlyStats, yearlyStats),
+    [appliedCycle, appliedYear, monthlyStats, quarterlyStats, yearlyStats],
+  )
+
+  const totalInvoices = revenueSeries.reduce((sum, item) => sum + (item.transactions || 0), 0)
+  const totalCustomers = patientSeries.reduce((sum, item) => sum + (item.totalPatients || 0), 0)
+  const avgInvoices = revenueSeries.length ? Math.round(totalInvoices / revenueSeries.length) : 0
+  const avgCustomers = patientSeries.length ? Math.round(totalCustomers / patientSeries.length) : 0
+  const totalRevenue = revenueSeries.reduce((sum, item) => sum + toAmountNumber(item.amount), 0)
+  const avgRevenue = revenueSeries.length ? totalRevenue / revenueSeries.length : 0
 
   const revenueChartConfig = {
-    data: revenueChartData,
-    xField: 'period',
-    yField: 'totalAmount',
-    color: '#73d13d',
+    data: revenueSeries,
+    xField: 'periodLabel',
+    yField: 'transactions',
+    color: '#1890ff',
+    smooth: true,
+    point: { size: 4, shape: 'circle' },
+    area: { style: { fillOpacity: 0.14 } },
     autoFit: true,
-    height: 360,
-    label: {
-      position: 'top',
-      formatter: (datum) => `${Math.round(datum.totalAmount).toLocaleString('vi-VN')} đ`,
-      style: { fill: '#4a4a4a' },
-    },
-    axis: {
-      y: { title: 'Doanh thu (VND)' },
-      x: { title: 'Mốc thời gian' },
-    },
-    interaction: {
-      tooltip: {
-        render: (_event, { title, items }) => (
-          <div style={{ padding: 8 }}>
-            <div style={{ marginBottom: 6, fontWeight: 600 }}>{title}</div>
-            <div>{`Doanh thu: ${formatCurrency(items?.[0]?.value ?? 0)}`}</div>
-          </div>
-        ),
-      },
+    xAxis: { title: false },
+    yAxis: { title: false },
+    tooltip: {
+      items: [
+        (datum) => ({ name: 'Hóa đơn', value: `${datum.transactions}` }),
+        (datum) => ({ name: 'Doanh thu', value: formatCurrency(datum.amount) }),
+      ],
     },
   }
 
-  const patientColumns = [
-    {
-      title: 'Mốc thời gian',
-      key: 'period',
-      render: (_, record) => formatPeriod(record, patientViewMode),
+  const patientChartConfig = {
+    data: patientSeries,
+    xField: 'periodLabel',
+    yField: 'totalPatients',
+    color: '#52c41a',
+    label: false,
+    autoFit: true,
+    xAxis: { title: false },
+    yAxis: { title: false },
+    tooltip: {
+      items: [
+        (datum) => ({
+          name: 'Số bệnh nhân',
+          value: `${datum.totalPatients}`,
+        }),
+      ],
     },
-    {
-      title: 'Số bệnh nhân',
-      dataIndex: 'totalPatients',
-      key: 'totalPatients',
-      width: 180,
-      render: (value) => <Tag color="blue">{value ?? 0}</Tag>,
-    },
-  ]
-
-  const revenueColumns = [
-    {
-      title: 'Mốc thời gian',
-      key: 'period',
-      render: (_, record) => formatPeriod(record, revenueViewMode),
-    },
-    {
-      title: 'Doanh thu',
-      dataIndex: 'totalAmount',
-      key: 'totalAmount',
-      width: 220,
-      render: (value) => <Tag color="green">{formatCurrency(value)}</Tag>,
-    },
-    {
-      title: 'Số giao dịch thành công',
-      dataIndex: 'totalTransactions',
-      key: 'totalTransactions',
-      width: 180,
-      render: (value) => value ?? 0,
-    },
-  ]
+  }
 
   return (
-    <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
-      <Title level={3} style={{ margin: 0 }}>
-        Thống kê
-      </Title>
-
-      <Space wrap style={{ width: '100%' }}>
-        <Card style={{ minWidth: 280, flex: 1 }}>
-          <Statistic title="Tổng doanh thu (toàn thời gian)" value={formatCurrency(allRevenueAmount)} />
-          <Text type="secondary">
-            Năm gần nhất: {yearlyRevenueStats[0]?.year || '-'} - {formatCurrency(latestRevenueAmount)}
-          </Text>
-        </Card>
-        <Card style={{ minWidth: 280, flex: 1 }}>
-          <Statistic title="Tổng bệnh nhân (toàn thời gian)" value={allPatientTotal} />
-          <Text type="secondary">
-            Năm gần nhất: {yearlyStats[0]?.year || '-'} - {latestYearlyTotal} bệnh nhân
-          </Text>
-        </Card>
-      </Space>
-
-      <Card>
-        <Space
-          style={{ width: '100%', justifyContent: 'space-between', marginBottom: 12 }}
-          align="center"
-          wrap
-        >
-          <Title level={5} style={{ margin: 0 }}>
-            Thống kê doanh thu
+    <Space direction="vertical" size={20} style={{ width: '100%' }}>
+      <div>
+        <Space size={10} align="center">
+          <BarChartOutlined style={{ fontSize: 24, color: '#1890ff' }} />
+          <Title level={2} style={{ margin: 0 }}>
+            Thống kê hệ thống
           </Title>
-          <Segmented
-            value={revenueViewMode}
-            options={[
-              { label: 'Theo tháng', value: VIEW_MODE.MONTHLY },
-              { label: 'Theo quý', value: VIEW_MODE.QUARTERLY },
-              { label: 'Theo năm', value: VIEW_MODE.YEARLY },
-            ]}
-            onChange={setRevenueViewMode}
-          />
         </Space>
-        {revenueChartData.length > 0 ? (
-          <Column {...revenueChartConfig} />
-        ) : (
-          <Empty description="Chưa có dữ liệu doanh thu" style={{ marginBlock: 40 }} />
-        )}
-        <Title level={5} style={{ marginBottom: 12 }}>
-          Dữ liệu chi tiết doanh thu
-        </Title>
-        <Table
-          rowKey={(record) =>
-            `revenue-${record.year || '0'}-${record.month || '0'}-${record.quarter || '0'}`
-          }
-          loading={loading}
-          columns={revenueColumns}
-          dataSource={currentRevenueStats}
-          pagination={{ pageSize: 10, showSizeChanger: false }}
-        />
+        <Text type="secondary">Theo dõi hiệu suất hóa đơn và khách hàng theo thời gian</Text>
+      </div>
+
+      <Card loading={loading}>
+        <Space size={12} wrap>
+          <Text strong>Năm:</Text>
+          <Select
+            style={{ minWidth: 120 }}
+            value={selectedYear}
+            options={yearOptions}
+            onChange={setSelectedYear}
+            placeholder="Chọn năm"
+          />
+          <Text strong>Chu kỳ:</Text>
+          <Select
+            style={{ minWidth: 140 }}
+            value={selectedCycle}
+            options={[
+              { label: 'Theo tháng', value: CYCLE.MONTHLY },
+              { label: 'Theo quý', value: CYCLE.QUARTERLY },
+              { label: 'Theo năm', value: CYCLE.YEARLY },
+            ]}
+            onChange={setSelectedCycle}
+          />
+          <Button type="primary" icon={<RiseOutlined />} onClick={applyFilter} disabled={!selectedYear}>
+            Xem thống kê
+          </Button>
+        </Space>
       </Card>
 
-      <Card>
-        <Space
-          style={{ width: '100%', justifyContent: 'space-between', marginBottom: 12 }}
-          align="center"
-          wrap
-        >
-          <Title level={5} style={{ margin: 0 }}>
-            Thống kê số bệnh nhân
-          </Title>
-          <Segmented
-            value={patientViewMode}
-            options={[
-              { label: 'Theo tháng', value: VIEW_MODE.MONTHLY },
-              { label: 'Theo quý', value: VIEW_MODE.QUARTERLY },
-              { label: 'Theo năm', value: VIEW_MODE.YEARLY },
-            ]}
-            onChange={setPatientViewMode}
-          />
-        </Space>
-        {patientChartData.length > 0 ? (
-          <Column {...patientChartConfig} />
-        ) : (
-          <Empty description="Chưa có dữ liệu thống kê" style={{ marginBlock: 40 }} />
-        )}
-        <Title level={5} style={{ marginBottom: 12 }}>
-          Dữ liệu chi tiết
-        </Title>
-        <Table
-          rowKey={(record) =>
-            `${record.year || '0'}-${record.month || '0'}-${record.quarter || '0'}`
-          }
-          loading={loading}
-          columns={patientColumns}
-          dataSource={currentStats}
-          pagination={{ pageSize: 10, showSizeChanger: false }}
-        />
-      </Card>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} sm={12} lg={6}>
+          <Card loading={loading}>
+            <Statistic
+              title="Tổng hóa đơn năm"
+              value={totalInvoices}
+              prefix={<FileTextOutlined style={{ color: '#1677ff' }} />}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card loading={loading}>
+            <Statistic
+              title="Tổng khách hàng năm"
+              value={totalCustomers}
+              prefix={<UserOutlined style={{ color: '#52c41a' }} />}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card loading={loading}>
+            <Statistic
+              title={`Trung bình hóa đơn/${cycleLabel(appliedCycle).replace('Theo ', '')}`}
+              value={avgInvoices}
+              prefix={<FileTextOutlined style={{ color: '#faad14' }} />}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card loading={loading}>
+            <Statistic
+              title={`Trung bình khách hàng/${cycleLabel(appliedCycle).replace('Theo ', '')}`}
+              value={avgCustomers}
+              prefix={<UserOutlined style={{ color: '#ff4d4f' }} />}
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      <Row gutter={[16, 16]}>
+        <Col xs={24} lg={12}>
+          <Card
+            loading={loading}
+            title={`Thống kê hóa đơn ${appliedYear || ''}`}
+            extra={<Text type="secondary">{cycleLabel(appliedCycle)}</Text>}
+          >
+            {revenueSeries.length ? (
+              <Line {...revenueChartConfig} />
+            ) : (
+              <Empty description="Chưa có dữ liệu hóa đơn" />
+            )}
+            <Text type="secondary" style={{ marginTop: 8, display: 'block' }}>
+              Tổng doanh thu: {formatCurrency(totalRevenue)} | Trung bình doanh thu/{cycleLabel(appliedCycle).replace('Theo ', '')}:{' '}
+              {formatCurrency(avgRevenue)}
+            </Text>
+          </Card>
+        </Col>
+        <Col xs={24} lg={12}>
+          <Card
+            loading={loading}
+            title={`Thống kê khách hàng ${appliedYear || ''}`}
+            extra={<Text type="secondary">{cycleLabel(appliedCycle)}</Text>}
+          >
+            {patientSeries.length ? (
+              <Column {...patientChartConfig} />
+            ) : (
+              <Empty description="Chưa có dữ liệu khách hàng" />
+            )}
+          </Card>
+        </Col>
+      </Row>
     </Space>
   )
 }
-
