@@ -316,7 +316,7 @@ export default function DoctorManagementPage() {
 
       <Drawer
         title={selectedDoctor ? `Chi tiết bác sĩ: ${selectedDoctor.fullName}` : 'Chi tiết bác sĩ'}
-        width={560}
+        size="large"
         open={Boolean(selectedDoctor)}
         onClose={() => setSelectedDoctor(null)}
         extra={

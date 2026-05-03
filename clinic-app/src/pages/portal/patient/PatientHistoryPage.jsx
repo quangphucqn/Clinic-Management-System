@@ -115,7 +115,7 @@ export default function PatientHistoryPage() {
   )
 
   return (
-    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+    <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
       <Card>
         <Space
           align="start"
@@ -135,7 +135,7 @@ export default function PatientHistoryPage() {
       </Card>
 
       <Card>
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <Text type="secondary">Nhấn vào từng dòng để xem chi tiết lần khám</Text>
 
           {historyItems.length ? (
@@ -172,12 +172,12 @@ export default function PatientHistoryPage() {
 
       <Drawer
         title="Chi tiết lịch sử khám"
-        width={520}
+        size="large"
         open={Boolean(selectedRecord)}
         onClose={() => setSelectedRecord(null)}
       >
         {selectedRecord ? (
-          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
             <Descriptions column={1} bordered size="small">
               <Descriptions.Item label="Mã hồ sơ">{selectedRecord.medicalRecordId}</Descriptions.Item>
               <Descriptions.Item label="Bác sĩ">{selectedRecord.doctorName || '-'}</Descriptions.Item>
@@ -206,7 +206,7 @@ export default function PatientHistoryPage() {
               {detailLoading ? (
                 <Card loading />
               ) : detailPrescription ? (
-                <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                <Space orientation="vertical" size="small" style={{ width: '100%' }}>
                   <Descriptions size="small" column={1}>
                     <Descriptions.Item label="Bác sĩ kê đơn">
                       {detailPrescription.doctorName || '-'}

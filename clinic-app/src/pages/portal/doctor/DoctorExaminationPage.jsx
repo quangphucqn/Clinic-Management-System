@@ -107,7 +107,7 @@ function getLabStatusMeta(status) {
 
 function buildMedicineOptions(items) {
   return items.map((item) => ({
-    label: `${item.name} • ${formatCurrency(item.price)} • Tồn ${item.stockQuantity ?? 0}`,
+    label: `${item.name} - ${item.unitName}`,
     value: item.id,
   }))
 }
@@ -385,9 +385,9 @@ export default function DoctorExaminationPage() {
 
   return (
     <div className="doctor-examination">
-      <Space direction="vertical" size="middle" className="doctor-examination__stack">
+      <Space orientation="vertical" size="middle" className="doctor-examination__stack">
         <Card className="doctor-examination__hero">
-          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
             <div className="doctor-examination__hero-row">
               <div className="doctor-examination__hero-text">
                 <Button
@@ -453,7 +453,7 @@ export default function DoctorExaminationPage() {
 
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={8}>
-            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
               <Card title="Tiến trình khám" className="doctor-examination__progress-card">
                 <div className="doctor-examination__progress-list">
                   {progressItems.map((item) => (
@@ -484,7 +484,7 @@ export default function DoctorExaminationPage() {
           </Col>
 
           <Col xs={24} lg={16}>
-            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
               <Card className="doctor-examination__section">
                 <div className="doctor-examination__section-header">
                   <Space>
@@ -554,7 +554,7 @@ export default function DoctorExaminationPage() {
                 {!medicalRecord ? (
                   <Empty style={{ marginTop: 16 }} description="Tạo bệnh án trước để chỉ định xét nghiệm" />
                 ) : (
-                  <Space direction="vertical" size="middle" style={{ width: '100%', marginTop: 16 }}>
+                  <Space orientation="vertical" size="middle" style={{ width: '100%', marginTop: 16 }}>
                     <Form form={labOrderForm} layout="vertical">
                       <Row gutter={12}>
                         <Col xs={24} md={10}>
@@ -578,12 +578,12 @@ export default function DoctorExaminationPage() {
                     </Form>
 
                     {labTests.length ? (
-                      <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                      <Space orientation="vertical" size="small" style={{ width: '100%' }}>
                         {labTests.map((labTest) => {
                           const statusMeta = getLabStatusMeta(labTest.status)
                           return (
                             <Card key={labTest.id} size="small" className="doctor-examination__lab-item">
-                              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                              <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
                                 <div className="doctor-examination__section-header">
                                   <div>
                                     <Text strong>{labTest.testName || '-'}</Text>
@@ -648,7 +648,7 @@ export default function DoctorExaminationPage() {
                 {!medicalRecord ? (
                   <Empty style={{ marginTop: 16 }} description="Tạo bệnh án trước để kê đơn" />
                 ) : prescription ? (
-                  <Space direction="vertical" size="middle" style={{ width: '100%', marginTop: 16 }}>
+                  <Space orientation="vertical" size="middle" style={{ width: '100%', marginTop: 16 }}>
                     <Descriptions bordered column={1} size="small">
                       <Descriptions.Item label="Bệnh nhân">
                         {prescription.patientName || appointment.patient?.fullName || '-'}
@@ -700,13 +700,15 @@ export default function DoctorExaminationPage() {
                       ]}
                     >
                       {(fields, { add, remove }, { errors }) => (
-                        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                          {fields.map((field, index) => (
-                            <div key={field.key} className="doctor-examination__medication-row">
+                        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+                          {fields.map((field, index) => {
+                            const { key, ...restField } = field
+                            return (
+                            <div key={key} className="doctor-examination__medication-row">
                               <Row gutter={12}>
                                 <Col xs={24} md={24}>
                                   <Form.Item
-                                    {...field}
+                                    {...restField}
                                     label={`Thuốc ${index + 1}`}
                                     name={[field.name, 'medicineId']}
                                     rules={[{ required: true, message: 'Vui lòng chọn thuốc' }]}
@@ -729,7 +731,7 @@ export default function DoctorExaminationPage() {
                                 </Col>
                                 <Col xs={24} md={8}>
                                   <Form.Item
-                                    {...field}
+                                    {...restField}
                                     label="Số lượng"
                                     name={[field.name, 'quantity']}
                                     rules={[{ required: true, message: 'Nhập số lượng' }]}
@@ -739,7 +741,7 @@ export default function DoctorExaminationPage() {
                                 </Col>
                                 <Col xs={24} md={8}>
                                   <Form.Item
-                                    {...field}
+                                    {...restField}
                                     label="Liều dùng"
                                     name={[field.name, 'dosage']}
                                     rules={[{ required: true, message: 'Nhập liều dùng' }]}
@@ -749,7 +751,7 @@ export default function DoctorExaminationPage() {
                                 </Col>
                                 <Col xs={24} md={8}>
                                   <Form.Item
-                                    {...field}
+                                    {...restField}
                                     label="Tần suất"
                                     name={[field.name, 'frequency']}
                                     rules={[{ required: true, message: 'Nhập tần suất' }]}
@@ -759,7 +761,7 @@ export default function DoctorExaminationPage() {
                                 </Col>
                                 <Col xs={24} md={8}>
                                   <Form.Item
-                                    {...field}
+                                    {...restField}
                                     label="Số ngày"
                                     name={[field.name, 'durationDays']}
                                     rules={[{ required: true, message: 'Nhập số ngày' }]}
@@ -769,7 +771,7 @@ export default function DoctorExaminationPage() {
                                 </Col>
                                 <Col xs={24} md={16}>
                                   <Form.Item
-                                    {...field}
+                                    {...restField}
                                     label="Ghi chú"
                                     name={[field.name, 'note']}
                                   >
@@ -783,7 +785,8 @@ export default function DoctorExaminationPage() {
                                 </Button>
                               ) : null}
                             </div>
-                          ))}
+                            )
+                          })}
 
                           <Form.ErrorList errors={errors} />
 
@@ -809,6 +812,7 @@ export default function DoctorExaminationPage() {
       <Modal
         title={activeLabTest?.result ? 'Kết quả xét nghiệm' : 'Nhập kết quả xét nghiệm'}
         open={labResultModalOpen}
+        forceRender
         onCancel={() => {
           setLabResultModalOpen(false)
           setActiveLabTest(null)

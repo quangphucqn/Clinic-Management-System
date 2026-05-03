@@ -375,7 +375,7 @@ export default function DoctorSchedulePage() {
 
       <Drawer
         title="Chi tiết lịch khám"
-        width={520}
+        size="large"
         open={drawerOpen}
         onClose={closeDrawer}
       >

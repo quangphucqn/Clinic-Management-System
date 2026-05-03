@@ -265,9 +265,9 @@ export default function AppointmentBookingPage() {
   }
 
   return (
-    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+    <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
       <Card>
-        <Space direction="vertical" size={4}>
+        <Space orientation="vertical" size={4}>
           <Title level={3} style={{ margin: 0 }}>
             Đặt khám
           </Title>
@@ -395,7 +395,7 @@ export default function AppointmentBookingPage() {
 
         <Col xs={24} lg={8}>
           <Card title="Thông tin đang chọn">
-            <Space direction="vertical" size={8}>
+            <Space orientation="vertical" size={8}>
               <Text>
                 <ClusterOutlined /> Khoa:{' '}
                 {specialtyOptions.find((item) => item.value === selectedSpecialtyId)?.label || '-'}

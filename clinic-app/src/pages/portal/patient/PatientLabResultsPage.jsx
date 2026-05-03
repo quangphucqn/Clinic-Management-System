@@ -125,7 +125,7 @@ export default function PatientLabResultsPage() {
   )
 
   return (
-    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+    <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
       <Card>
         <Space align="start" style={{ width: '100%', justifyContent: 'space-between' }} wrap>
           <div>
@@ -140,7 +140,7 @@ export default function PatientLabResultsPage() {
       </Card>
 
       <Card loading={loading}>
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <Space wrap>
             <Input
               allowClear
@@ -184,7 +184,7 @@ export default function PatientLabResultsPage() {
 
       <Drawer
         title="Chi tiết kết quả xét nghiệm"
-        width={520}
+        size="large"
         open={Boolean(selectedResult)}
         onClose={() => setSelectedResult(null)}
       >

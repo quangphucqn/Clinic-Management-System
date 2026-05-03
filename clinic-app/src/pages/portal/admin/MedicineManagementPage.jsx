@@ -586,7 +586,7 @@ export default function MedicineManagementPage() {
 
       <Drawer
         title={selectedMedicine?.name || 'Chi tiết thuốc'}
-        width={520}
+        size="large"
         open={Boolean(selectedMedicine)}
         onClose={() => setSelectedMedicine(null)}
       >

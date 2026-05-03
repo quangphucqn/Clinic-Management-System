@@ -249,7 +249,7 @@ export default function StatisticsPage() {
   }
 
   return (
-    <Space direction="vertical" size={20} style={{ width: '100%' }}>
+    <Space orientation="vertical" size={20} style={{ width: '100%' }}>
       <div>
         <Space size={10} align="center">
           <BarChartOutlined style={{ fontSize: 24, color: '#1890ff' }} />
