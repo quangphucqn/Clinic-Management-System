@@ -39,3 +39,7 @@ momo:
   ipn-url: ${MOMO_IPN_URL:http://localhost:8080/api/payments/momo/ipn}
   request-type: ${MOMO_REQUEST_TYPE:captureWallet}
   lang: ${MOMO_LANG:vi}
+
+app:
+  cors:
+    allowed-origin-patterns: ${CORS_ALLOWED_ORIGIN_PATTERNS:http://localhost:5173,http://localhost:5174,https://*.ngrok-free.dev,https://*.ngrok.app}
