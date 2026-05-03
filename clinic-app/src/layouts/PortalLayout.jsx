@@ -9,6 +9,7 @@ import {
   ClockCircleOutlined,
   DownOutlined,
   FileTextOutlined,
+  MenuOutlined,
   MedicineBoxOutlined,
   MoneyCollectOutlined,
   StarOutlined,
@@ -98,7 +99,7 @@ function getMenuItemsByRole(role) {
   if (role === ROLES.ADMIN) {
     return [
       { key: ROUTES.adminNotifications, icon: <BellOutlined />, label: 'Quản lý thông báo' },
-      { key: ROUTES.adminDepositConfig, icon: <MoneyCollectOutlined />, label: 'Tiền đặt cọc khám' },
+      { key: ROUTES.adminDepositConfig, icon: <MoneyCollectOutlined />, label: 'Cấu hình tiền đặt cọc' },
       { key: ROUTES.adminTimeslots, icon: <ClockCircleOutlined />, label: 'Quản lý giờ khám' },
       { key: ROUTES.adminSpecialties, icon: <ClusterOutlined />, label: 'Quản lý chuyên khoa' },
       { key: ROUTES.adminDoctors, icon: <TeamOutlined />, label: 'Quản lý bác sĩ' },
@@ -133,6 +134,8 @@ export default function PortalLayout() {
   const [notificationPageSize, setNotificationPageSize] = useState(10)
   const [notificationTotal, setNotificationTotal] = useState(0)
   const [bellRinging, setBellRinging] = useState(false)
+  const [isMobileSider, setIsMobileSider] = useState(false)
+  const [siderCollapsed, setSiderCollapsed] = useState(false)
 
   const selectedKey =
     items.find((item) => location.pathname.startsWith(item.key))?.key ||
@@ -261,9 +264,31 @@ export default function PortalLayout() {
     }
   }
 
+  function handleMenuClick({ key }) {
+    navigate(key)
+    if (isMobileSider) {
+      setSiderCollapsed(true)
+    }
+  }
+
   return (
     <Layout className="portal-layout">
-      <Sider theme="light" width={260} breakpoint="lg" collapsedWidth={0}>
+      <Sider
+        theme="light"
+        width={260}
+        breakpoint="lg"
+        collapsedWidth={0}
+        collapsible
+        trigger={null}
+        collapsed={siderCollapsed}
+        onBreakpoint={(broken) => {
+          setIsMobileSider(broken)
+          setSiderCollapsed(broken)
+        }}
+        onCollapse={(nextCollapsed) => {
+          setSiderCollapsed(nextCollapsed)
+        }}
+      >
         <div className="portal-layout__brand">
           <span className="portal-layout__brand-mark">
             <img
@@ -275,15 +300,27 @@ export default function PortalLayout() {
           <span className="portal-layout__brand-text">CMS</span>
         </div>
         <Menu
+          className="portal-layout__menu"
           mode="inline"
           selectedKeys={selectedKey ? [selectedKey] : []}
           items={items}
-          onClick={({ key }) => navigate(key)}
+          onClick={handleMenuClick}
         />
       </Sider>
       <Layout>
         <Header className="portal-layout__header">
-          <Space>
+          <div className="portal-layout__header-left">
+            {isMobileSider ? (
+              <Button
+                type="text"
+                aria-label="Mở menu"
+                icon={<MenuOutlined />}
+                className="portal-layout__mobile-menu-button"
+                onClick={() => setSiderCollapsed((value) => !value)}
+              />
+            ) : null}
+          </div>
+          <Space size={12} className="portal-layout__header-actions">
             <Button
               type="text"
               aria-label="Thông báo"
@@ -294,9 +331,11 @@ export default function PortalLayout() {
               icon={<BellFilled />}
               onClick={openNotificationModal}
             />
-            <Text type="secondary">Xin chào,</Text>
+            <Text type="secondary" className="portal-layout__greeting-label">
+              Xin chào,
+            </Text>
             <Dropdown
-              trigger={['hover']}
+              trigger={isMobileSider ? ['click'] : ['hover']}
               menu={{ items: profileMenuItems, onClick: handleProfileMenuClick }}
             >
               <Button type="link" className="portal-layout__profile-link">
@@ -318,7 +357,7 @@ export default function PortalLayout() {
         open={notificationModalOpen}
         onCancel={() => setNotificationModalOpen(false)}
         footer={null}
-        width={640}
+        width={isMobileSider ? 'calc(100vw - 24px)' : 640}
       >
         <Table
           rowKey="id"
