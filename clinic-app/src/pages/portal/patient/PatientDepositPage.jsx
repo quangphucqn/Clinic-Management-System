@@ -168,7 +168,7 @@ export default function PatientDepositPage() {
   )
 
   return (
-    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+    <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
       <Card>
         <Space
           align="start"
@@ -206,7 +206,7 @@ export default function PatientDepositPage() {
 
       <Drawer
         title="Chi tiết lịch khám"
-        width={520}
+        size="large"
         open={Boolean(selectedAppointment)}
         onClose={() => setSelectedAppointment(null)}
         extra={

@@ -214,7 +214,7 @@ export default function PatientReviewPage() {
   )
 
   return (
-    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+    <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
       <Card>
         <Space align="start" style={{ width: '100%', justifyContent: 'space-between' }} wrap>
           <div>
@@ -321,7 +321,7 @@ export default function PatientReviewPage() {
 
       <Drawer
         title="Chi tiết đánh giá của tôi"
-        width={520}
+        size="large"
         open={Boolean(selectedReview)}
         onClose={() => setSelectedReview(null)}
       >

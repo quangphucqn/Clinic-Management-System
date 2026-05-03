@@ -325,9 +325,9 @@ export default function DoctorPatientHistoryPage() {
   const selectedPatientDisplay = selectedPatient?.fullName || '-'
 
   return (
-    <Space direction="vertical" size="middle" className="doctor-patient-history">
+    <Space orientation="vertical" size="middle" className="doctor-patient-history">
       <Card className="doctor-patient-history__hero">
-        <Space direction="vertical" size="small" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="small" style={{ width: '100%' }}>
           <Space align="start" className="doctor-patient-history__hero-header">
             <div>
               <Title level={3} style={{ margin: 0 }}>
@@ -387,7 +387,7 @@ export default function DoctorPatientHistoryPage() {
           />
         </Card>
       ) : (
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <Card
             title="Bệnh nhân đã chọn"
             extra={(
@@ -467,14 +467,14 @@ export default function DoctorPatientHistoryPage() {
 
       <Drawer
         title="Chi tiết hồ sơ bệnh án"
-        width={720}
+        size="large"
         open={detailOpen}
         onClose={resetDetailState}
       >
         {detailLoading ? (
           <Card loading />
         ) : detailRecord ? (
-          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
             <Card size="small" className="doctor-patient-history__detail-card">
               <Descriptions bordered column={1} size="small">
                 <Descriptions.Item label="Ngày khám">
@@ -494,7 +494,7 @@ export default function DoctorPatientHistoryPage() {
 
             <Card size="small" title="Đơn thuốc" className="doctor-patient-history__detail-card">
               {detailPrescription ? (
-                <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
                   <Descriptions column={1} size="small">
                     <Descriptions.Item label="Bác sĩ">{detailPrescription.doctorName || '-'}</Descriptions.Item>
                     <Descriptions.Item label="Hướng dẫn sử dụng">
@@ -524,7 +524,7 @@ export default function DoctorPatientHistoryPage() {
 
             <Card size="small" title="Xét nghiệm" className="doctor-patient-history__detail-card">
               {detailLabTests.length ? (
-                <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                <Space orientation="vertical" size="small" style={{ width: '100%' }}>
                   {detailLabTests.map((labTest) => (
                     <Card key={labTest.id} size="small" className="doctor-patient-history__lab-card">
                       <Descriptions column={1} size="small">

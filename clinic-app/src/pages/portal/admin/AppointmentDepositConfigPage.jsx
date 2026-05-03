@@ -58,7 +58,7 @@ export default function AppointmentDepositConfigPage() {
 
   return (
     <Card loading={loading}>
-      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+      <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
         <Title level={3} style={{ margin: 0 }}>
           Cấu hình tiền đặt cọc khám bệnh
         </Title>

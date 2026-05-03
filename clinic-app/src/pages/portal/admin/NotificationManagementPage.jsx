@@ -357,7 +357,7 @@ export default function NotificationManagementPage() {
 
       <Drawer
         title={selectedItem ? `Chi tiết: ${selectedItem.title}` : 'Chi tiết thông báo'}
-        width={560}
+        size="large"
         open={Boolean(selectedItem)}
         onClose={() => setSelectedItem(null)}
       >

@@ -61,7 +61,7 @@ export default function AppointmentPage() {
   }
 
   return (
-    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+    <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
       <Card>
         <Title level={3} style={{ margin: 0 }}>
           Appointment Booking
